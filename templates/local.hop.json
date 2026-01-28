@@ -1,0 +1,83 @@
+{
+  "$schema": "https://harnessops.org/schema/v0.1.0/hop.json",
+  "schema_version": "0.1.0",
+  "description": "HarnessOps Registry - Local Development Machine",
+
+  "machine": {
+    "id": "my-machine",
+    "name": "YOUR-MACHINE-NAME",
+    "type": "local-laptop",
+    "agent_root": "/path/to/your/dev",
+    "os": "linux",
+    "arch": "x64"
+  },
+
+  "accounts": {
+    "github": [
+      {
+        "username": "YOUR-USERNAME",
+        "role": "primary",
+        "default": true,
+        "auth_method": "ssh",
+        "active": true
+      }
+    ]
+  },
+
+  "preferences": {
+    "timezone": "America/New_York",
+    "timezone_abbreviation": "ET"
+  },
+
+  "projects": [
+    {
+      "name": "my-project",
+      "path": "/path/to/your/dev/my-project",
+      "type": "tool",
+      "owner": "YOUR-USERNAME",
+      "description": "My main project",
+      "git": {
+        "remote_url": "git@github.com:YOUR-USERNAME/my-project.git",
+        "default_branch": "main"
+      },
+      "extensions": {
+        "beads": {
+          "enabled": true,
+          "database_path": "/path/to/your/dev/my-project/.beads/",
+          "prefix": "proj"
+        }
+      }
+    }
+  ],
+
+  "bundles": [
+    {
+      "id": "default",
+      "name": "Default Projects",
+      "projects": ["my-project"],
+      "primary_project": "my-project"
+    }
+  ],
+
+  "extensions": {
+    "cli-activity-logs": {
+      "enabled": true,
+      "output_root": "/path/to/your/dev/.cli-logs",
+      "machine_id": "my-machine",
+      "clis": [
+        {
+          "name": "claude_code",
+          "display_name": "Claude Code",
+          "enabled": true,
+          "storage_locations": [
+            {
+              "path": "~/.claude/projects",
+              "type": "projects_dir",
+              "pattern": "*.jsonl"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

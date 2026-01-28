@@ -1,0 +1,86 @@
+# HarnessOps Specification Repository - .gitignore
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor and IDE files
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# Node.js (for validation tools)
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Python (for validation tools)
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+.venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# Test outputs
+coverage/
+.nyc_output/
+*.lcov
+
+# Local configuration overrides
+*.local.json
+hop.local.json
+
+# Research notes (may contain sensitive info)
+research/scratch/
+research/drafts/
+*.draft.md
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+
+# Log files
+*.log
+logs/
+
+# Secrets (should never be committed)
+.env
+.env.*
+!.env.example
+secrets/
+*.pem
+*.key
+
+# Archive/backup files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Generated documentation
+docs/_build/
+site/
+
+# Beads task tracking (local only)
+.beads/
+SECURITY-REVIEW.md

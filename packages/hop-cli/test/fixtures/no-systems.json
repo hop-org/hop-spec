@@ -1,0 +1,11 @@
+{
+  "$schema": "https://harnessops.org/schema/v0.1.0/hop.json",
+  "schema_version": "0.1.0",
+  "machine": {
+    "id": "bare",
+    "name": "Bare Machine"
+  },
+  "projects": [
+    { "name": "no-system-project", "path": "/tmp/x" }
+  ]
+}

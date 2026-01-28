@@ -1,0 +1,88 @@
+{
+  "$schema": "https://harnessops.org/schema/v0.1.0/hop.json",
+  "schema_version": "0.1.0",
+  "description": "HarnessOps Registry - Cloud IDE Environment",
+
+  "machine": {
+    "id": "my-machine",
+    "name": "YOUR-MACHINE-NAME",
+    "type": "cloud-vm",
+    "agent_root": "/workspace",
+    "os": "linux",
+    "arch": "x64"
+  },
+
+  "accounts": {
+    "github": [
+      {
+        "username": "YOUR-USERNAME",
+        "role": "primary",
+        "default": true,
+        "auth_method": "gh-cli",
+        "active": true,
+        "note": "Uses pre-configured GitHub CLI authentication"
+      }
+    ]
+  },
+
+  "preferences": {
+    "timezone": "UTC",
+    "timezone_abbreviation": "UTC",
+    "branch_patterns": {
+      "feature": "YY-MM-DD.NN-${description}",
+      "description": "Date-prefixed branches for cloud IDE work"
+    }
+  },
+
+  "projects": [
+    {
+      "name": "main-project",
+      "path": "/workspace/main-project",
+      "type": "tool",
+      "owner": "YOUR-ORG-OR-USERNAME",
+      "description": "Primary workspace project",
+      "git": {
+        "remote_url": "https://github.com/YOUR-ORG-OR-USERNAME/main-project.git",
+        "default_branch": "main"
+      },
+      "extensions": {
+        "beads": {
+          "enabled": true,
+          "database_path": "/workspace/main-project/.beads/",
+          "prefix": "main"
+        }
+      }
+    }
+  ],
+
+  "bundles": [
+    {
+      "id": "workspace",
+      "name": "Workspace Projects",
+      "projects": ["main-project"],
+      "primary_project": "main-project"
+    }
+  ],
+
+  "extensions": {
+    "cli-activity-logs": {
+      "enabled": true,
+      "output_root": "/workspace/.cli-logs",
+      "machine_id": "my-machine",
+      "clis": [
+        {
+          "name": "claude_code",
+          "display_name": "Claude Code",
+          "enabled": true,
+          "storage_locations": [
+            {
+              "path": "/workspace/.claude/projects",
+              "type": "projects_dir",
+              "pattern": "*.jsonl"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://harnessops.org/schema/v0.1.0/hop.json",
+  "schema_version": "0.1.0",
+  "description": "Minimal valid HarnessOps configuration - only required fields",
+  "machine": {
+    "id": "my-machine",
+    "name": "My Development Machine"
+  },
+  "projects": [
+    {
+      "name": "my-api",
+      "path": "/home/dev/my-api",
+      "system": "my-product",
+      "description": "API server — part of the my-product system"
+    }
+  ]
+}

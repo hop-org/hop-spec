@@ -1,0 +1,130 @@
+{
+  "$schema": "https://harnessops.org/schema/v0.1.0/hop.json",
+  "schema_version": "0.1.0",
+  "description": "HarnessOps Registry - VPS/Server Environment",
+
+  "machine": {
+    "id": "my-machine",
+    "name": "YOUR-MACHINE-NAME",
+    "type": "cloud-vps",
+    "agent_root": "/home/deploy/projects",
+    "os": "linux",
+    "arch": "x64"
+  },
+
+  "accounts": {
+    "github": [
+      {
+        "username": "deploy-bot",
+        "role": "primary",
+        "default": true,
+        "auth_method": "ssh",
+        "active": true,
+        "note": "Deployment service account - read-only access"
+      },
+      {
+        "username": "YOUR-ADMIN-USERNAME",
+        "role": "admin",
+        "default": false,
+        "auth_method": "https-pat",
+        "pat_bws_id": "YOUR-BITWARDEN-SECRET-UUID",
+        "active": true,
+        "note": "Admin account for manual interventions"
+      }
+    ]
+  },
+
+  "preferences": {
+    "timezone": "UTC",
+    "timezone_abbreviation": "UTC",
+    "branch_patterns": {
+      "hotfix": "hotfix/${date}-${description}",
+      "description": "Date-prefixed hotfix branches for server work"
+    }
+  },
+
+  "projects": [
+    {
+      "name": "api",
+      "path": "/home/deploy/projects/api",
+      "type": "tool",
+      "owner": "YOUR-ORG",
+      "description": "Production API deployment",
+      "git": {
+        "remote_url": "git@github.com:YOUR-ORG/api.git",
+        "default_branch": "main"
+      }
+    },
+    {
+      "name": "infra",
+      "path": "/home/deploy/projects/infra",
+      "type": "dev-env",
+      "owner": "YOUR-ORG",
+      "description": "Infrastructure scripts",
+      "git": {
+        "remote_url": "git@github.com:YOUR-ORG/infra.git",
+        "default_branch": "main"
+      },
+      "extensions": {
+        "beads": {
+          "enabled": true,
+          "database_path": "/home/deploy/projects/infra/.beads/",
+          "prefix": "infra"
+        }
+      }
+    }
+  ],
+
+  "bundles": [
+    {
+      "id": "production",
+      "name": "Production Services",
+      "projects": ["api"],
+      "primary_project": "api"
+    },
+    {
+      "id": "ops",
+      "name": "Operations",
+      "projects": ["infra"],
+      "primary_project": "infra"
+    }
+  ],
+
+  "scripts": {
+    "deploy": "/home/deploy/projects/infra/scripts/deploy",
+    "backup": "/home/deploy/projects/infra/scripts/backup"
+  },
+
+  "extensions": {
+    "infra-repos": {
+      "enabled": true,
+      "path": "/home/deploy/infra-clones",
+      "readonly": true,
+      "sync": "manual",
+      "contribute": {
+        "allowed": false,
+        "note": "Read-only clones on production server"
+      },
+      "repos": []
+    },
+    "cli-activity-logs": {
+      "enabled": true,
+      "output_root": "/home/deploy/logs/cli-activity",
+      "machine_id": "my-machine",
+      "clis": [
+        {
+          "name": "claude_code",
+          "display_name": "Claude Code",
+          "enabled": true,
+          "storage_locations": [
+            {
+              "path": "/home/deploy/.claude/projects",
+              "type": "projects_dir",
+              "pattern": "*.jsonl"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

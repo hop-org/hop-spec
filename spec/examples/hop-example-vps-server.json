@@ -1,0 +1,207 @@
+{
+  "$schema": "https://harnessops.org/schema/v0.1.0/hop.json",
+  "schema_version": "0.1.0",
+  "description": "HarnessOps Registry - VPS/Cloud Server Environment",
+
+  "machine": {
+    "id": "prod-vps",
+    "name": "Production VPS Server",
+    "type": "cloud-vps",
+    "agent_root": "/home/deploy/projects",
+    "os": "linux",
+    "arch": "x64"
+  },
+
+  "accounts": {
+    "github": [
+      {
+        "username": "deploy-bot",
+        "role": "primary",
+        "default": true,
+        "git_alias": "bot",
+        "auth_method": "ssh",
+        "active": true,
+        "note": "Deployment service account with read-only access"
+      },
+      {
+        "username": "admin-user",
+        "role": "admin",
+        "default": false,
+        "git_alias": "admin",
+        "auth_method": "https-pat",
+        "pat_bws_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "active": true,
+        "note": "Admin account for manual interventions - requires PAT"
+      }
+    ]
+  },
+
+  "preferences": {
+    "timezone": "UTC",
+    "timezone_abbreviation": "UTC",
+    "branch_patterns": {
+      "hotfix": "hotfix/${date}-${description}",
+      "description": "Date-prefixed hotfix branches for server work"
+    }
+  },
+
+  "projects": [
+    {
+      "name": "api-prod",
+      "path": "/home/deploy/projects/api",
+      "type": "tool",
+      "system": "production",
+      "owner": "myorg",
+      "description": "Production API deployment",
+      "git": {
+        "remote_url": "git@github.com:myorg/api.git",
+        "default_branch": "main"
+      }
+    },
+    {
+      "name": "web-prod",
+      "path": "/home/deploy/projects/web",
+      "type": "website",
+      "system": "production",
+      "owner": "myorg",
+      "description": "Production website deployment",
+      "git": {
+        "remote_url": "git@github.com:myorg/web.git",
+        "default_branch": "main"
+      }
+    },
+    {
+      "name": "infra-scripts",
+      "path": "/home/deploy/projects/infra",
+      "type": "dev-env",
+      "owner": "myorg",
+      "description": "Infrastructure and deployment scripts",
+      "git": {
+        "remote_url": "git@github.com:myorg/infra.git",
+        "default_branch": "main"
+      },
+      "extensions": {
+        "beads": {
+          "enabled": true,
+          "database_path": "/home/deploy/projects/infra/.beads/",
+          "prefix": "infra"
+        }
+      }
+    }
+  ],
+
+  "bundles": [
+    {
+      "id": "production",
+      "name": "Production Services",
+      "description": "All production deployments",
+      "projects": ["api-prod", "web-prod"],
+      "primary_project": "api-prod"
+    },
+    {
+      "id": "ops",
+      "name": "Operations",
+      "description": "Infrastructure and tooling",
+      "projects": ["infra-scripts"],
+      "primary_project": "infra-scripts"
+    }
+  ],
+
+  "scripts": {
+    "deploy": "/home/deploy/projects/infra/scripts/deploy",
+    "backup": "/home/deploy/projects/infra/scripts/backup",
+    "monitor": "/home/deploy/projects/infra/scripts/monitor"
+  },
+
+  "cross_project": {
+    "home_project": "infra-scripts",
+    "artifacts_path": "/home/deploy/shared-artifacts",
+    "description": "Shared artifacts across production services"
+  },
+
+  "infra_repos": {
+    "path": "/home/deploy/infra-clones",
+    "readonly": true,
+    "sync": "weekly-cron-pull",
+    "contribute": {
+      "allowed": false
+    },
+    "repos": [
+      {"name": "docker-compose-templates", "system": "deployment"},
+      {"name": "nginx-configs", "system": "deployment"},
+      {"name": "monitoring-dashboards", "system": "observability"}
+    ]
+  },
+
+  "extensions": {
+    "ntm": {
+      "enabled": true,
+      "path": "/tmp/agent-sessions",
+      "description": "Temporary agent session storage - cleared on reboot"
+    },
+    "cli-activity-logs": {
+      "enabled": true,
+      "output_root": "/home/deploy/logs/cli-activity",
+      "machine_id": "prod-vps",
+      "clis": [
+        {
+          "name": "claude_code",
+          "display_name": "Claude Code",
+          "enabled": true,
+          "storage_locations": [
+            {
+              "path": "/home/deploy/.claude/projects",
+              "type": "projects_dir",
+              "pattern": "*.jsonl",
+              "validated": true,
+              "session_count": 127,
+              "last_validated": "2026-01-20T12:00:00Z"
+            }
+          ],
+          "output": {
+            "subdir": "claude-code",
+            "filename_prefix": "claude_sessions"
+          }
+        },
+        {
+          "name": "codex_cli",
+          "display_name": "Codex CLI",
+          "enabled": true,
+          "storage_locations": [
+            {
+              "path": "/home/deploy/.codex/log",
+              "type": "sessions_dir",
+              "pattern": "*.jsonl",
+              "validated": true,
+              "session_count": 45,
+              "last_validated": "2026-01-20T12:00:00Z"
+            }
+          ],
+          "output": {
+            "subdir": "codex",
+            "filename_prefix": "codex_sessions"
+          }
+        },
+        {
+          "name": "gemini_cli",
+          "display_name": "Gemini CLI",
+          "enabled": true,
+          "storage_locations": [
+            {
+              "path": "/home/deploy/.gemini/sessions",
+              "type": "sessions_dir",
+              "pattern": "*.json",
+              "validated": true,
+              "session_count": 32,
+              "last_validated": "2026-01-20T12:00:00Z"
+            }
+          ],
+          "output": {
+            "subdir": "gemini",
+            "filename_prefix": "gemini_sessions"
+          }
+        }
+      ]
+    }
+  }
+}

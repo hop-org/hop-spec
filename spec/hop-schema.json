@@ -1,0 +1,456 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://harnessops.org/schema/v0.1.0/hop.json",
+  "title": "HarnessOps Registry",
+  "description": "HarnessOps — declarative specification for AI development machine environments, unifying tool configuration, project registration, MCP server setup, and multi-machine synchronization.",
+  "type": "object",
+  "required": ["schema_version", "machine"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference for validation and editor support",
+      "format": "uri"
+    },
+    "schema_version": {
+      "type": "string",
+      "description": "HarnessOps schema version (semver)",
+      "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$",
+      "examples": ["0.1.0", "0.2.0"]
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of this HarnessOps registry instance"
+    },
+    "machine": {
+      "$ref": "#/$defs/machine"
+    },
+    "accounts": {
+      "$ref": "#/$defs/accounts"
+    },
+    "preferences": {
+      "$ref": "#/$defs/preferences"
+    },
+    "cross_project": {
+      "$ref": "#/$defs/crossProject"
+    },
+    "projects": {
+      "type": "array",
+      "description": "List of project definitions",
+      "items": {
+        "$ref": "#/$defs/project"
+      }
+    },
+    "bundles": {
+      "type": "array",
+      "description": "Logical groupings of projects for workflow organization",
+      "items": {
+        "$ref": "#/$defs/bundle"
+      }
+    },
+    "infra_repos": {
+      "$ref": "#/$defs/infraRepos"
+    },
+    "scripts": {
+      "type": "object",
+      "description": "Named paths to script collections",
+      "additionalProperties": {
+        "type": "string",
+        "description": "Absolute path to script directory"
+      }
+    },
+    "extensions": {
+      "$ref": "#/$defs/extensions",
+      "description": "Machine-scoped extensions for config agents can't self-discover. Tool authors define their own configuration under a unique key (e.g., \"beads\", \"basic-memory\", \"agent-mail\"). Only include config that an agent would waste time or make mistakes without. HarnessOps core does not validate extension contents — each tool owns its own sub-schema."
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "machine": {
+      "type": "object",
+      "description": "Machine identity and configuration",
+      "required": ["id", "name"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique machine identifier (slug format)",
+          "pattern": "^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$",
+          "examples": ["prod-vps", "my-cloud-ide", "dev-laptop"]
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable machine name",
+          "examples": ["Production VPS", "Cloud IDE Workspace"]
+        },
+        "type": {
+          "type": "string",
+          "description": "Machine type classification",
+          "enum": ["cloud-vps", "cloud-vm", "local-desktop", "local-laptop", "container", "wsl"],
+          "examples": ["cloud-vps", "local-laptop"]
+        },
+        "agent_root": {
+          "type": "string",
+          "description": "Root directory for agent work (absolute path)",
+          "examples": ["/home/dev/projects", "/root/workspace", "/Users/me/dev"]
+        },
+        "os": {
+          "type": "string",
+          "description": "Operating system",
+          "enum": ["linux", "darwin", "windows"]
+        },
+        "arch": {
+          "type": "string",
+          "description": "CPU architecture",
+          "enum": ["x64", "arm64", "x86"]
+        }
+      },
+      "additionalProperties": true
+    },
+    "accounts": {
+      "type": "object",
+      "description": "Authentication identities organized by service",
+      "properties": {
+        "github": {
+          "type": "array",
+          "description": "GitHub account configurations",
+          "items": {
+            "$ref": "#/$defs/githubAccount"
+          }
+        }
+      },
+      "additionalProperties": {
+        "type": "array",
+        "description": "Additional service accounts"
+      }
+    },
+    "githubAccount": {
+      "type": "object",
+      "required": ["username"],
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "GitHub username"
+        },
+        "role": {
+          "type": "string",
+          "description": "Account role classification",
+          "examples": ["primary", "personal", "work", "client"]
+        },
+        "default": {
+          "type": "boolean",
+          "description": "Whether this is the default account for operations",
+          "default": false
+        },
+        "git_alias": {
+          "type": "string",
+          "description": "Short alias for git operations",
+          "examples": ["work", "personal"]
+        },
+        "auth_method": {
+          "type": "string",
+          "description": "Authentication method",
+          "enum": ["ssh", "https-pat", "gh-cli", "oauth"],
+          "default": "ssh"
+        },
+        "pat_bws_id": {
+          "type": "string",
+          "description": "Bitwarden Secrets Manager ID for PAT retrieval"
+        },
+        "active": {
+          "type": "boolean",
+          "description": "Whether account is currently active",
+          "default": true
+        },
+        "note": {
+          "type": "string",
+          "description": "Usage notes for this account"
+        }
+      },
+      "additionalProperties": true
+    },
+    "preferences": {
+      "type": "object",
+      "description": "User-level preferences",
+      "properties": {
+        "timezone": {
+          "type": "string",
+          "description": "IANA timezone identifier",
+          "examples": ["America/Chicago", "UTC", "Europe/London"]
+        },
+        "timezone_abbreviation": {
+          "type": "string",
+          "description": "Short timezone display",
+          "examples": ["CT", "UTC", "GMT"]
+        },
+        "branch_patterns": {
+          "type": "object",
+          "description": "Git branch naming patterns with template variables",
+          "properties": {
+            "feature": {
+              "type": "string",
+              "description": "Pattern for feature branches"
+            },
+            "description": {
+              "type": "string",
+              "description": "Documentation of pattern variables"
+            }
+          },
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "crossProject": {
+      "type": "object",
+      "description": "Cross-project artifact storage configuration",
+      "properties": {
+        "home_project": {
+          "type": "string",
+          "description": "Name of the home/central project"
+        },
+        "artifacts_path": {
+          "type": "string",
+          "description": "Absolute path for cross-project artifacts"
+        },
+        "description": {
+          "type": "string",
+          "description": "Purpose description"
+        }
+      },
+      "additionalProperties": true
+    },
+    "project": {
+      "type": "object",
+      "description": "Project definition",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Unique project identifier (slug format)",
+          "pattern": "^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$"
+        },
+        "path": {
+          "type": "string",
+          "description": "Absolute filesystem path to project root"
+        },
+        "type": {
+          "type": "string",
+          "description": "Project type classification",
+          "examples": [
+            "dev-env", "marketplace", "tool", "research", "central",
+            "commercial", "website", "social", "marketing", "home"
+          ]
+        },
+        "owner": {
+          "type": "string",
+          "description": "GitHub organization or username that owns the repo"
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable project description"
+        },
+        "git": {
+          "$ref": "#/$defs/gitConfig"
+        },
+        "account_override": {
+          "type": "string",
+          "description": "GitHub username to use instead of default account"
+        },
+        "branch_checkouts": {
+          "type": "object",
+          "description": "Multi-branch checkout paths (for IDEs that create separate directories)",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "system": {
+          "type": "string",
+          "description": "Logical system this project belongs to. Multiple projects (repos) that cooperate to deliver one capability share the same system identifier. Inspired by Backstage's System Model. Query with jq: .projects[] | select(.system == \"billing\")",
+          "pattern": "^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$",
+          "examples": ["billing", "agent-flywheel", "payments"]
+        },
+        "note": {
+          "type": "string",
+          "description": "Additional notes about this project"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions",
+          "description": "Project-scoped extensions for config agents can't self-discover (e.g., beads prefix, basic-memory project name, agent-mail project key). Only include what makes agents meaningfully more effective. HarnessOps core does not validate extension contents — each tool owns its own sub-schema."
+        }
+      },
+      "additionalProperties": true
+    },
+    "gitConfig": {
+      "type": "object",
+      "description": "Git repository configuration",
+      "properties": {
+        "remote_url": {
+          "type": "string",
+          "description": "Git remote URL (HTTPS or SSH format)",
+          "examples": ["git@github.com:user/repo.git", "https://github.com/user/repo.git"]
+        },
+        "default_branch": {
+          "type": "string",
+          "description": "Default branch name",
+          "default": "main"
+        }
+      },
+      "additionalProperties": true
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Generic extension namespace. Keys are tool identifiers (e.g., \"beads\", \"basic-memory\", \"agent-mail\", \"claude-code\"). Values are tool-defined configuration objects. Only for config agents can't self-discover. Follows the devcontainer.json customizations pattern: core spec does not define extension contents — tool authors own their sub-schemas.",
+      "additionalProperties": {
+        "$ref": "#/$defs/extensionEntry"
+      },
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9_-]*[a-z0-9]$|^[a-z0-9]$",
+        "description": "Extension keys must be lowercase slugs (letters, digits, hyphens, underscores)"
+      },
+      "examples": [
+        {
+          "beads": { "enabled": true, "prefix": "app" },
+          "basic-memory": { "enabled": true, "project_name": "my-app" },
+          "fireflies": { "enabled": true },
+          "ntm": { "enabled": true, "path": "/data/ntm" }
+        }
+      ]
+    },
+    "extensionEntry": {
+      "type": "object",
+      "description": "A single extension configuration block. Tool authors define the shape of their extension. The optional $schema property allows tools to provide a JSON Schema URI for validation of their specific extension config.",
+      "properties": {
+        "$schema": {
+          "type": "string",
+          "format": "uri",
+          "description": "Optional JSON Schema URI for validating this extension's configuration. Tool authors can publish schemas (e.g., \"https://beads-project.org/schema/v1/hop-extension.json\") so that editors and validators can check extension-specific fields."
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Convention: extensions SHOULD support an enabled flag for easy toggling without removing configuration.",
+          "default": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "bundle": {
+      "type": "object",
+      "description": "Logical grouping of projects",
+      "required": ["id", "name", "projects"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique bundle identifier",
+          "pattern": "^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable bundle name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Bundle purpose description"
+        },
+        "projects": {
+          "type": "array",
+          "description": "List of project names in this bundle",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "primary_project": {
+          "type": "string",
+          "description": "Default project when bundle is selected"
+        }
+      },
+      "additionalProperties": true
+    },
+    "infraRepos": {
+      "type": "object",
+      "description": "Infrastructure repository clones — read-only reference copies of external repos cloned for tool source inspection, API reference, or building from source. These are not the user's own projects; they are reference clones of upstream repositories.",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Absolute path to the directory containing infra repo clones",
+          "examples": ["/home/dev/infra-clones", "/Users/me/tool-clones"]
+        },
+        "readonly": {
+          "type": "boolean",
+          "description": "Whether clones should be treated as read-only (no local commits)",
+          "default": true
+        },
+        "sync": {
+          "type": "string",
+          "description": "Sync strategy for keeping clones up to date",
+          "examples": ["manual", "weekly-cron-pull", "daily-cron-pull"]
+        },
+        "contribute": {
+          "type": "object",
+          "description": "Policy for contributing changes back to upstream repos",
+          "properties": {
+            "allowed": {
+              "type": "boolean",
+              "description": "Whether contributions back to upstream are permitted",
+              "default": false
+            },
+            "requires_flags": {
+              "type": "array",
+              "description": "Required conditions before contributing (e.g., fork-first, explicit-pr-approval)",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": true
+        },
+        "repos": {
+          "type": "array",
+          "description": "List of infrastructure repository entries. Each entry can be a simple directory name (string) or an object with metadata including system membership.",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string",
+                "description": "Repository directory name (simple form)"
+              },
+              {
+                "type": "object",
+                "description": "Repository entry with metadata",
+                "required": ["name"],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Repository directory name within the infra_repos path"
+                  },
+                  "system": {
+                    "type": "string",
+                    "description": "Logical system this infra repo belongs to. Same concept as project.system — groups related repos across both owned projects and reference clones.",
+                    "pattern": "^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$",
+                    "examples": ["agent-flywheel", "agent-clis"]
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "What this infra repo is used for"
+                  },
+                  "upstream": {
+                    "type": "string",
+                    "description": "Upstream repository URL",
+                    "format": "uri"
+                  }
+                },
+                "additionalProperties": true
+              }
+            ]
+          },
+          "examples": [
+            ["tool-cli", "agent-framework"],
+            [{"name": "cass", "system": "agent-flywheel"}, {"name": "claude-code", "system": "agent-clis"}, "misc-tool"]
+          ]
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

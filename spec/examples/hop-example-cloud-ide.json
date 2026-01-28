@@ -1,0 +1,150 @@
+{
+  "$schema": "https://harnessops.org/schema/v0.1.0/hop.json",
+  "schema_version": "0.1.0",
+  "description": "HarnessOps Registry - Cloud IDE Environment (Gitpod, Codespaces, etc.)",
+
+  "machine": {
+    "id": "my-cloud-ide",
+    "name": "Cloud IDE Workspace",
+    "type": "cloud-vm",
+    "agent_root": "/workspace",
+    "os": "linux",
+    "arch": "x64"
+  },
+
+  "accounts": {
+    "github": [
+      {
+        "username": "myusername",
+        "role": "primary",
+        "default": true,
+        "git_alias": "me",
+        "auth_method": "gh-cli",
+        "active": true,
+        "note": "Uses GitHub CLI for authentication (pre-configured in cloud IDE)"
+      }
+    ]
+  },
+
+  "preferences": {
+    "timezone": "UTC",
+    "timezone_abbreviation": "UTC",
+    "branch_patterns": {
+      "feature": "YY-MM-DD.NN-${alias}-${machine_id}",
+      "description": "Date-prefixed branches include machine ID for cloud IDE work"
+    }
+  },
+
+  "projects": [
+    {
+      "name": "main-project",
+      "path": "/workspace/main-project",
+      "type": "dev-env",
+      "system": "myorg-platform",
+      "owner": "myorg",
+      "description": "Primary development workspace",
+      "git": {
+        "remote_url": "https://github.com/myorg/main-project.git",
+        "default_branch": "main"
+      },
+      "extensions": {
+        "beads": {
+          "enabled": true,
+          "database_path": "/workspace/main-project/.beads/",
+          "prefix": "main"
+        },
+        "basic-memory": {
+          "enabled": true,
+          "project_name": "main-project",
+          "root_path": "/workspace/main-project/.memory/"
+        }
+      }
+    },
+    {
+      "name": "api-service",
+      "path": "/workspace/api-service",
+      "type": "tool",
+      "system": "myorg-platform",
+      "owner": "myorg",
+      "description": "Backend API service",
+      "git": {
+        "remote_url": "https://github.com/myorg/api-service.git",
+        "default_branch": "main"
+      },
+      "branch_checkouts": {
+        "dev": "/workspace/api-service-dev-abc123",
+        "staging": "/workspace/api-service-staging-def456",
+        "main": "/workspace/api-service"
+      },
+      "note": "Cloud IDE creates separate directories per branch checkout"
+    }
+  ],
+
+  "bundles": [
+    {
+      "id": "dev",
+      "name": "Development",
+      "description": "Active development work",
+      "projects": ["main-project", "api-service"],
+      "primary_project": "main-project"
+    }
+  ],
+
+  "extensions": {
+    "fireflies": {
+      "enabled": true,
+      "api_url": "https://api.fireflies.ai/graphql",
+      "channels": {
+        "team-standup": {
+          "id": "channel-id-here",
+          "description": "Daily standup recordings",
+          "owner": "team-lead"
+        }
+      },
+      "transcript_storage": {
+        "root_path": "/workspace/.transcripts",
+        "format": "markdown",
+        "naming_pattern": "YYYY-MM-DD-{meeting_title}.md"
+      }
+    },
+    "cli-activity-logs": {
+      "enabled": true,
+      "output_root": "/workspace/.cli-logs",
+      "machine_id": "my-cloud-ide",
+      "clis": [
+        {
+          "name": "claude_code",
+          "display_name": "Claude Code",
+          "enabled": true,
+          "storage_locations": [
+            {
+              "path": "/workspace/.claude/projects",
+              "type": "projects_dir",
+              "pattern": "*.jsonl"
+            }
+          ],
+          "output": {
+            "subdir": "claude-code",
+            "filename_prefix": "claude_sessions"
+          }
+        },
+        {
+          "name": "codex_cli",
+          "display_name": "Codex CLI",
+          "enabled": true,
+          "storage_locations": [
+            {
+              "path": "/workspace/.codex/log",
+              "type": "sessions_dir",
+              "pattern": "*.jsonl"
+            }
+          ],
+          "output": {
+            "subdir": "codex",
+            "filename_prefix": "codex_sessions"
+          }
+        }
+      ]
+    }
+  }
+}

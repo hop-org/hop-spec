@@ -1,0 +1,8 @@
+{
+  "$schema": "https://harnessops.org/schema/v0.1.0/hop.json",
+  "schema_version": "0.1.0",
+  "machine": {
+    "id": "my-machine",
+    "name": "YOUR-MACHINE-NAME"
+  }
+}

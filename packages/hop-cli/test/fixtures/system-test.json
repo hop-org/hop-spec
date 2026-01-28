@@ -1,0 +1,59 @@
+{
+  "$schema": "https://harnessops.org/schema/v0.1.0/hop.json",
+  "schema_version": "0.1.0",
+  "description": "Test fixture for system field integration",
+  "machine": {
+    "id": "test-systems",
+    "name": "System Test Machine",
+    "type": "cloud-vps",
+    "os": "linux",
+    "arch": "x64"
+  },
+  "projects": [
+    {
+      "name": "api-core",
+      "path": "/home/test/projects/api-core",
+      "type": "tool",
+      "system": "payments",
+      "description": "Payments API core service"
+    },
+    {
+      "name": "api-gateway",
+      "path": "/home/test/projects/api-gateway",
+      "type": "tool",
+      "system": "payments",
+      "description": "Payments API gateway"
+    },
+    {
+      "name": "dashboard",
+      "path": "/home/test/projects/dashboard",
+      "type": "website",
+      "system": "analytics",
+      "description": "Analytics dashboard"
+    },
+    {
+      "name": "standalone",
+      "path": "/home/test/projects/standalone",
+      "type": "tool",
+      "description": "No system assigned"
+    }
+  ],
+  "bundles": [
+    {
+      "id": "pay",
+      "name": "Payments",
+      "projects": ["api-core", "api-gateway"],
+      "primary_project": "api-core"
+    }
+  ],
+  "infra_repos": {
+    "path": "/home/test/infra-clones",
+    "readonly": true,
+    "repos": [
+      {"name": "payment-sdk", "system": "payments", "description": "Third-party payment SDK", "upstream": "https://github.com/example/payment-sdk.git"},
+      {"name": "chart-lib", "system": "analytics", "description": "Charting library"},
+      "generic-tool",
+      {"name": "deploy-scripts", "system": "ops"}
+    ]
+  }
+}

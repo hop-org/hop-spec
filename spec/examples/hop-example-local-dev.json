@@ -1,0 +1,142 @@
+{
+  "$schema": "https://harnessops.org/schema/v0.1.0/hop.json",
+  "schema_version": "0.1.0",
+  "description": "HarnessOps Registry - Local Development Machine (WSL/macOS/Linux)",
+
+  "machine": {
+    "id": "dev-laptop",
+    "name": "Developer Laptop",
+    "type": "local-laptop",
+    "agent_root": "/home/developer/dev",
+    "os": "linux",
+    "arch": "x64"
+  },
+
+  "accounts": {
+    "github": [
+      {
+        "username": "myusername",
+        "role": "primary",
+        "default": true,
+        "git_alias": "me",
+        "auth_method": "ssh",
+        "active": true
+      },
+      {
+        "username": "work-account",
+        "role": "work",
+        "default": false,
+        "git_alias": "work",
+        "auth_method": "https-pat",
+        "pat_bws_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "active": true,
+        "note": "Use for work repositories - requires PAT auth"
+      }
+    ]
+  },
+
+  "preferences": {
+    "timezone": "America/New_York",
+    "timezone_abbreviation": "ET",
+    "branch_patterns": {
+      "feature": "feature/${description}",
+      "bugfix": "bugfix/${description}",
+      "description": "Simple branch naming - description is kebab-case"
+    }
+  },
+
+  "projects": [
+    {
+      "name": "my-app",
+      "path": "/home/developer/dev/my-app",
+      "type": "tool",
+      "system": "my-app",
+      "owner": "myusername",
+      "description": "Main application project",
+      "git": {
+        "remote_url": "git@github.com:myusername/my-app.git",
+        "default_branch": "main"
+      },
+      "extensions": {
+        "beads": {
+          "enabled": true,
+          "database_path": "/home/developer/dev/my-app/.beads/",
+          "prefix": "app"
+        },
+        "basic-memory": {
+          "enabled": true,
+          "project_name": "my-app",
+          "root_path": "/home/developer/dev/my-app/.memory/"
+        }
+      }
+    },
+    {
+      "name": "work-project",
+      "path": "/home/developer/dev/work-project",
+      "type": "commercial",
+      "system": "client-portal",
+      "owner": "my-company",
+      "description": "Work client project",
+      "git": {
+        "remote_url": "https://github.com/my-company/work-project.git",
+        "default_branch": "main"
+      },
+      "account_override": "work-account"
+    },
+    {
+      "name": "playground",
+      "path": "/home/developer/dev/playground",
+      "type": "research",
+      "description": "Experiments and learning - no git tracking"
+    }
+  ],
+
+  "bundles": [
+    {
+      "id": "personal",
+      "name": "Personal Projects",
+      "description": "My open source and personal projects",
+      "projects": ["my-app", "playground"],
+      "primary_project": "my-app"
+    },
+    {
+      "id": "work",
+      "name": "Work Projects",
+      "description": "Client and employment work",
+      "projects": ["work-project"],
+      "primary_project": "work-project"
+    }
+  ],
+
+  "cross_project": {
+    "home_project": "my-app",
+    "artifacts_path": "/home/developer/dev/my-app/.shared/",
+    "description": "Cross-project artifacts stored in main project"
+  },
+
+  "extensions": {
+    "cli-activity-logs": {
+      "enabled": true,
+      "output_root": "/home/developer/dev/.cli-logs",
+      "machine_id": "dev-laptop",
+      "clis": [
+        {
+          "name": "claude_code",
+          "display_name": "Claude Code",
+          "enabled": true,
+          "storage_locations": [
+            {
+              "path": "/home/developer/.claude/projects",
+              "type": "projects_dir",
+              "pattern": "*.jsonl"
+            }
+          ],
+          "output": {
+            "subdir": "claude-code",
+            "filename_prefix": "claude_sessions"
+          }
+        }
+      ]
+    }
+  }
+}

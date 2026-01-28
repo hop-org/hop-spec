@@ -1,0 +1,4 @@
+{
+  "private": true,
+  "workspaces": ["hop-core", "hop-cli", "hop-mcp"]
+}

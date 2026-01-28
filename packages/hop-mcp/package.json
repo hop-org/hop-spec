@@ -1,0 +1,27 @@
+{
+  "name": "@harnessops/mcp",
+  "version": "0.1.0",
+  "description": "MCP server for HarnessOps — exposes hop.json data to AI agents",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "hop-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "test": "bun test"
+  },
+  "files": ["dist"],
+  "license": "MIT",
+  "dependencies": {
+    "@harnessops/core": "../hop-core",
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.10",
+    "typescript": "^5.9.3"
+  }
+}

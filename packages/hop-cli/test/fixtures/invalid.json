@@ -1,0 +1,7 @@
+{
+  "schema_version": "0.1.0",
+  "machine": {
+    "id": 12345,
+    "name": "valid-name"
+  }
+}
