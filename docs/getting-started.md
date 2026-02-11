@@ -464,6 +464,45 @@ hop projects --json
 hop machine --json
 ```
 
+### CLI `--json` Output Format
+
+**Important**: CLI `--json` output differs from the hop.json file structure.
+
+Collection commands (`projects`, `bundles`) return **bare arrays**:
+
+```bash
+# CLI output: bare array
+hop projects --json
+# → [{name: "my-app", ...}, {name: "my-lib", ...}]
+
+hop bundles --json
+# → [{id: "default", ...}]
+
+# hop.json FILE: wrapped in named keys
+jq '.projects' ~/.hop/hop.json
+# → [{name: "my-app", ...}]  (same array, but accessed via .projects key)
+```
+
+When scripting, use `.[]` to iterate CLI output, not `.projects[]`:
+
+```bash
+# ✅ Correct: bare array from CLI
+hop projects --json | jq -r '.[].name'
+
+# ❌ Wrong: .projects[] fails on CLI output (bare array has no "projects" key)
+hop projects --json | jq -r '.projects[].name'
+
+# ✅ Correct: .projects[] when reading the file directly
+jq -r '.projects[].name' ~/.hop/hop.json
+```
+
+Singleton commands (`machine`, `account`) return **objects**:
+
+```bash
+hop machine --json
+# → {id: "my-machine", name: "My Dev Machine", ...}
+```
+
 ---
 
 ## Step 12: Set Up the MCP Server
