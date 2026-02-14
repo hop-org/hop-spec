@@ -26,4 +26,6 @@ export type {
   InfraRepos,
   Extensions,
   ExtensionEntry,
+  Services,
+  Service,
 } from "./types.js";

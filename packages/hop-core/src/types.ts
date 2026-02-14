@@ -16,6 +16,7 @@ export interface HopConfig {
   infra_repos?: InfraRepos;
   scripts?: Record<string, string>;
   extensions?: Extensions;
+  services?: Services;
   [key: string]: unknown;
 }
 
@@ -123,5 +124,25 @@ export interface Extensions {
 export interface ExtensionEntry {
   $schema?: string;
   enabled?: boolean;
+  [key: string]: unknown;
+}
+
+/**
+ * Running infrastructure services that agents discover at runtime.
+ * Unlike extensions (tool config), services represent live endpoints.
+ */
+export interface Services {
+  [key: string]: Service;
+}
+
+export interface Service {
+  /** HTTP(S) endpoint for the service */
+  url?: string;
+  /** CLI binary name or path if the service is invoked as a process */
+  binary?: string;
+  /** Environment variable name holding the auth token */
+  token_env?: string;
+  /** Human-readable description */
+  description?: string;
   [key: string]: unknown;
 }
