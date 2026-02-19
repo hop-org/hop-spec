@@ -36,7 +36,7 @@ function loadConfig(): { config: HopConfig; path: string } {
 
 const server = new McpServer(
   {
-    name: "harnessops",
+    name: "hop-mcp",
     version: "0.1.0",
   },
   {
