@@ -1,4 +1,9 @@
 {
   "private": true,
-  "workspaces": ["packages/*"]
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "build": "bun run --cwd packages/hop-core build && bun run --cwd packages/hop-cli build && bun run --cwd packages/hop-mcp build",
+    "bundle": "bun run build && bun run --cwd packages/hop-cli bundle && bun run --cwd packages/hop-mcp bundle",
+    "install-user": "bun run bundle && bash scripts/install.sh"
+  }
 }

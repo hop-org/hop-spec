@@ -9,6 +9,7 @@
   "main": "dist/cli.js",
   "scripts": {
     "build": "tsc",
+    "bundle": "bun build --bundle --target=node --outfile=dist/hop-cli.bundle.js src/cli.ts",
     "dev": "tsc --watch",
     "test": "bun test"
   },
