@@ -16,13 +16,13 @@ This guide walks you through creating and using your first HarnessOps configurat
 ## Step 1: Install the CLI
 
 ```bash
-bun install -g @harnessops/cli   # or: npm install -g @harnessops/cli
+bun install -g @hop-org/hop-spec-cli   # or: npm install -g @hop-org/hop-spec-cli
 ```
 
 Or use without installing:
 
 ```bash
-bunx @harnessops/cli init   # or: npx @harnessops/cli init
+bunx @hop-org/hop-spec-cli init   # or: npx @hop-org/hop-spec-cli init
 ```
 
 ## Step 2: Create Your First hop.json
@@ -512,7 +512,7 @@ The HarnessOps MCP server lets AI agents (Claude Code, etc.) query your hop.json
 ### Install
 
 ```bash
-bun install -g @harnessops/mcp   # or: npm install -g @harnessops/mcp
+bun install -g @hop-org/hop-spec-mcp   # or: npm install -g @hop-org/hop-spec-mcp
 ```
 
 ### Configure in Claude Code
@@ -522,8 +522,8 @@ Add to your Claude Code MCP settings (`~/.claude/settings.json`):
 ```json
 {
   "mcpServers": {
-    "harnessops": {
-      "command": "harnessops-mcp",
+    "hop-mcp": {
+      "command": "hop-mcp",
       "env": {
         "HOP_CONFIG_PATH": "/path/to/your/hop.json"
       }
@@ -717,4 +717,4 @@ Here's a complete, production-ready `hop.json`:
 
 ---
 
-*Need help? Open an issue on the [HarnessOps spec repository](https://github.com/hop-spec/hop-spec/issues).*
+*Need help? Open an issue on the [HarnessOps spec repository](https://github.com/hop-org/hop-spec/issues).*

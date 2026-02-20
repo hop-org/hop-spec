@@ -4,13 +4,13 @@
   "workspaces": {
     "": {},
     "packages/hop-cli": {
-      "name": "@harnessops/cli",
+      "name": "@hop-org/hop-spec-cli",
       "version": "0.1.0",
       "bin": {
         "hop": "dist/cli.js",
       },
       "dependencies": {
-        "@harnessops/core": "workspace:*",
+        "@hop-org/hop-spec-core": "workspace:*",
         "ajv": "^8.17.0",
         "ajv-formats": "^3.0.0",
         "commander": "^12.0.0",
@@ -21,7 +21,7 @@
       },
     },
     "packages/hop-core": {
-      "name": "@harnessops/core",
+      "name": "@hop-org/hop-spec-core",
       "version": "0.1.0",
       "devDependencies": {
         "@types/node": "^25.0.10",
@@ -29,13 +29,13 @@
       },
     },
     "packages/hop-mcp": {
-      "name": "@harnessops/mcp",
+      "name": "@hop-org/hop-spec-mcp",
       "version": "0.1.0",
       "bin": {
         "hop-mcp": "dist/index.js",
       },
       "dependencies": {
-        "@harnessops/core": "workspace:*",
+        "@hop-org/hop-spec-core": "workspace:*",
         "@modelcontextprotocol/sdk": "^1.12.0",
         "zod": "^3.23.0",
       },
@@ -46,13 +46,13 @@
     },
   },
   "packages": {
-    "@harnessops/cli": ["@harnessops/cli@workspace:packages/hop-cli"],
-
-    "@harnessops/core": ["@harnessops/core@workspace:packages/hop-core"],
-
-    "@harnessops/mcp": ["@harnessops/mcp@workspace:packages/hop-mcp"],
-
     "@hono/node-server": ["@hono/node-server@1.19.9", "", { "peerDependencies": { "hono": "^4" } }, "sha512-vHL6w3ecZsky+8P5MD+eFfaGTyCeOHUIFYMGpQGbrBTSmNNoxv0if69rEZ5giu36weC5saFuznL411gRX7bJDw=="],
+
+    "@hop-org/hop-spec-cli": ["@hop-org/hop-spec-cli@workspace:packages/hop-cli"],
+
+    "@hop-org/hop-spec-core": ["@hop-org/hop-spec-core@workspace:packages/hop-core"],
+
+    "@hop-org/hop-spec-mcp": ["@hop-org/hop-spec-mcp@workspace:packages/hop-mcp"],
 
     "@modelcontextprotocol/sdk": ["@modelcontextprotocol/sdk@1.25.3", "", { "dependencies": { "@hono/node-server": "^1.19.9", "ajv": "^8.17.1", "ajv-formats": "^3.0.1", "content-type": "^1.0.5", "cors": "^2.8.5", "cross-spawn": "^7.0.5", "eventsource": "^3.0.2", "eventsource-parser": "^3.0.0", "express": "^5.0.1", "express-rate-limit": "^7.5.0", "jose": "^6.1.1", "json-schema-typed": "^8.0.2", "pkce-challenge": "^5.0.0", "raw-body": "^3.0.0", "zod": "^3.25 || ^4.0", "zod-to-json-schema": "^3.25.0" }, "peerDependencies": { "@cfworker/json-schema": "^4.1.1" }, "optionalPeers": ["@cfworker/json-schema"] }, "sha512-vsAMBMERybvYgKbg/l4L1rhS7VXV1c0CtyJg72vwxONVX0l4ZfKVAnZEWTQixJGTzKnELjQ59e4NbdFDALRiAQ=="],
 

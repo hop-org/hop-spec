@@ -20,7 +20,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { discoverAndLoad, collectSystems, normalizeInfraRepo, infraRepoName, type HopConfig, type Project, type InfraRepoEntry } from "@harnessops/core";
+import { discoverAndLoad, collectSystems, normalizeInfraRepo, infraRepoName, type HopConfig, type Project, type InfraRepoEntry } from "@hop-org/hop-spec-core";
 
 function loadConfig(): { config: HopConfig; path: string } {
   const result = discoverAndLoad();
@@ -46,8 +46,21 @@ const server = new McpServer(
   }
 );
 
+// ---------- Selective Tool Loading ----------
+// Set HOP_MCP_TOOLS="hop_machine,hop_list_projects" to load only those tools.
+// Omit the variable to load all 9 tools (default).
+
+const HOP_MCP_TOOLS_ENV = process.env.HOP_MCP_TOOLS;
+const enabledTools: Set<string> | null = HOP_MCP_TOOLS_ENV
+  ? new Set(HOP_MCP_TOOLS_ENV.split(",").map(t => t.trim()).filter(Boolean))
+  : null;
+
+function shouldRegister(name: string): boolean {
+  return enabledTools === null || enabledTools.has(name);
+}
+
 // --- hop_machine ---
-server.tool(
+if (shouldRegister("hop_machine")) server.tool(
   "hop_machine",
   "Get machine identity and configuration from hop.json. Returns machine id, name, type, OS, architecture, and agent_root.",
   {},
@@ -73,7 +86,7 @@ server.tool(
 );
 
 // --- hop_list_projects ---
-server.tool(
+if (shouldRegister("hop_list_projects")) server.tool(
   "hop_list_projects",
   "List all projects registered in hop.json. Returns name, path, and type for each project.",
   {
@@ -109,7 +122,7 @@ server.tool(
 );
 
 // --- hop_get_project ---
-server.tool(
+if (shouldRegister("hop_get_project")) server.tool(
   "hop_get_project",
   "Get full details for a specific project by name. Returns all fields including git config, extensions, and integrations.",
   {
@@ -151,7 +164,7 @@ server.tool(
 );
 
 // --- hop_get_account ---
-server.tool(
+if (shouldRegister("hop_get_account")) server.tool(
   "hop_get_account",
   "Get account information by service (e.g., 'github'). Optionally filter by username. Returns all matching accounts.",
   {
@@ -222,7 +235,7 @@ server.tool(
 );
 
 // --- hop_list_bundles ---
-server.tool(
+if (shouldRegister("hop_list_bundles")) server.tool(
   "hop_list_bundles",
   "List all bundles defined in hop.json. Bundles are logical groupings of projects for workflow organization. Optionally filter to only bundles containing a specific project.",
   {
@@ -259,7 +272,7 @@ server.tool(
 );
 
 // --- hop_get_bundle ---
-server.tool(
+if (shouldRegister("hop_get_bundle")) server.tool(
   "hop_get_bundle",
   "Get full details for a specific bundle by ID, including resolved project details for each member project.",
   {
@@ -318,7 +331,7 @@ server.tool(
 );
 
 // --- hop_list_infra_repos ---
-server.tool(
+if (shouldRegister("hop_list_infra_repos")) server.tool(
   "hop_list_infra_repos",
   "List infrastructure repository clones defined in hop.json. Infra repos are read-only reference clones of external repositories used for source inspection, API reference, or building from source.",
   {},
@@ -366,7 +379,7 @@ server.tool(
 );
 
 // --- hop_list_systems ---
-server.tool(
+if (shouldRegister("hop_list_systems")) server.tool(
   "hop_list_systems",
   "List all unique systems defined across projects and infra repos. A system groups multiple repos that cooperate to deliver one capability (inspired by Backstage's System Model).",
   {},
@@ -411,7 +424,7 @@ server.tool(
 );
 
 // --- hop_get_system ---
-server.tool(
+if (shouldRegister("hop_get_system")) server.tool(
   "hop_get_system",
   "Get all projects and infra repos belonging to a specific system. Returns full project details and infra repo metadata for the named system.",
   {

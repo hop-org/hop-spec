@@ -194,7 +194,7 @@ What parts of the design are still TBD?
 
 ```bash
 # Clone the repository
-git clone https://github.com/hop-spec/hop-spec.git
+git clone https://github.com/hop-org/hop-spec.git
 cd hop-spec
 
 # Install dependencies
@@ -222,6 +222,19 @@ cd packages/hop-cli && bun test
 # MCP server tests (9 tests)
 cd packages/hop-mcp && bun test
 ```
+
+### Publishing to npm
+
+Packages use `workspace:*` dependencies, which bun resolves to real version numbers during publish:
+
+```bash
+# Publish all packages (bun handles workspace:* → version resolution)
+cd packages/hop-core && bun publish --access public
+cd packages/hop-cli && bun publish --access public
+cd packages/hop-mcp && bun publish --access public
+```
+
+Packages are published under the `@hop-org` npm scope. The scope must exist at [npmjs.com](https://www.npmjs.com/org/create) before the first publish.
 
 ---
 

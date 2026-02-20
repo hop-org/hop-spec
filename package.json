@@ -5,5 +5,11 @@
     "build": "bun run --cwd packages/hop-core build && bun run --cwd packages/hop-cli build && bun run --cwd packages/hop-mcp build",
     "bundle": "bun run build && bun run --cwd packages/hop-cli bundle && bun run --cwd packages/hop-mcp bundle",
     "install-user": "bun run bundle && bash scripts/install.sh"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hop-org/hop-spec.git"
+  },
+  "homepage": "https://github.com/hop-org/hop-spec",
+  "bugs": "https://github.com/hop-org/hop-spec/issues"
 }

@@ -3,8 +3,8 @@
 import { Command } from "commander";
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { discoverAndLoad, discoverHopPath, setConfigPath, collectSystems, normalizeInfraRepo, infraRepoName } from "@harnessops/core";
-import type { HopConfig } from "@harnessops/core";
+import { discoverAndLoad, discoverHopPath, setConfigPath, collectSystems, normalizeInfraRepo, infraRepoName } from "@hop-org/hop-spec-core";
+import type { HopConfig } from "@hop-org/hop-spec-core";
 import { runInit } from "./init.js";
 import { runValidate } from "./validate.js";
 import { runDiscover } from "./discover.js";

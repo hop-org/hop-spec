@@ -1,5 +1,5 @@
 {
-  "name": "@harnessops/mcp",
+  "name": "@hop-org/hop-spec-mcp",
   "version": "0.1.0",
   "description": "MCP server for HarnessOps — exposes hop.json data to AI agents",
   "type": "module",
@@ -16,8 +16,20 @@
   },
   "files": ["dist"],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hop-org/hop-spec.git",
+    "directory": "packages/hop-mcp"
+  },
+  "homepage": "https://github.com/hop-org/hop-spec/tree/main/packages/hop-mcp",
+  "bugs": "https://github.com/hop-org/hop-spec/issues",
+  "author": "HarnessOps Contributors",
+  "keywords": ["harnessops", "hop", "mcp", "model-context-protocol", "ai-agent"],
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
-    "@harnessops/core": "workspace:*",
+    "@hop-org/hop-spec-core": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.12.0",
     "zod": "^3.23.0"
   },

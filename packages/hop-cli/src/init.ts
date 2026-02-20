@@ -9,8 +9,8 @@ import { writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { resolve, dirname, join } from "node:path";
 import { homedir, hostname as getHostname } from "node:os";
 import { createInterface } from "node:readline";
-import type { HopConfig, Machine } from "@harnessops/core";
-import { discoverHopPath, ensureHopDir, setConfigPath, HOP_DEFAULT_PATH } from "@harnessops/core";
+import type { HopConfig, Machine } from "@hop-org/hop-spec-core";
+import { discoverHopPath, ensureHopDir, setConfigPath, HOP_DEFAULT_PATH } from "@hop-org/hop-spec-core";
 
 const SCHEMA_URL = "https://harnessops.org/schema/v0.1.0/hop.json";
 const SCHEMA_VERSION = "0.1.0";

@@ -19,7 +19,7 @@ const EXAMPLE_CONFIG = join(
 );
 
 // We test by loading the config and applying the same logic as the MCP tools
-import { discoverAndLoad, type HopConfig, type Bundle } from "@harnessops/core";
+import { discoverAndLoad, type HopConfig, type Bundle } from "@hop-org/hop-spec-core";
 
 function loadTestConfig(): HopConfig {
   // Use the example config for testing

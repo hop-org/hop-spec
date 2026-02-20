@@ -1,4 +1,4 @@
-# @harnessops/mcp
+# @hop-org/hop-spec-mcp
 
 MCP server for [HarnessOps](../../README.md) — exposes `hop.json` data to AI agents via the [Model Context Protocol](https://modelcontextprotocol.io/).
 
@@ -10,19 +10,24 @@ MCP server for [HarnessOps](../../README.md) — exposes `hop.json` data to AI a
 | `hop_list_projects` | List all projects with optional type filter |
 | `hop_get_project` | Get full project details by name |
 | `hop_get_account` | Get account info by service, optional username filter |
+| `hop_list_bundles` | List all bundles (optional project filter) |
+| `hop_get_bundle` | Get bundle details with resolved project objects |
+| `hop_list_infra_repos` | List infrastructure repo clones with status |
+| `hop_list_systems` | List all systems with project and infra repo counts |
+| `hop_get_system` | Get all projects and infra repos in a specific system |
 
 ## Usage
 
 ### With Claude Code
 
-Add to your `claude_desktop_config.json` or project MCP settings:
+Add to your `.mcp.json` or `claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
-    "harnessops": {
+    "hop-mcp": {
       "command": "npx",
-      "args": ["-y", "@harnessops/mcp"],
+      "args": ["-y", "@hop-org/hop-spec-mcp"],
       "env": {
         "HOP_CONFIG_PATH": "/path/to/your/hop.json"
       }
@@ -37,13 +42,44 @@ Add to your `claude_desktop_config.json` or project MCP settings:
 HOP_CONFIG_PATH=../../spec/examples/hop-example-vps-server.json bun src/index.ts
 ```
 
-### hop.json Discovery
+### Bundled (local install)
+
+```bash
+node /path/to/hop-spec/packages/hop-mcp/dist/hop-mcp.bundle.js
+```
+
+## Selective Tool Loading
+
+Set `HOP_MCP_TOOLS` to a comma-separated list of tool names to load only those tools. This saves context window space when you only need a subset.
+
+```json
+{
+  "mcpServers": {
+    "hop-mcp": {
+      "command": "npx",
+      "args": ["-y", "@hop-org/hop-spec-mcp"],
+      "env": {
+        "HOP_MCP_TOOLS": "hop_machine,hop_list_projects,hop_get_project"
+      }
+    }
+  }
+}
+```
+
+Omit `HOP_MCP_TOOLS` to load all 9 tools (default, backward compatible).
+
+### Available tool names
+
+`hop_machine`, `hop_list_projects`, `hop_get_project`, `hop_get_account`, `hop_list_bundles`, `hop_get_bundle`, `hop_list_infra_repos`, `hop_list_systems`, `hop_get_system`
+
+## hop.json Discovery
 
 If `HOP_CONFIG_PATH` is not set, the server discovers `hop.json` by:
 
-1. Walking up from the current working directory
-2. Checking `~/.config/hop/hop.json`
-3. Checking `/etc/hop/hop.json`
+1. `~/.hop/settings.json` pointer
+2. `~/.hop/hop.json` (default location)
+3. Walking up from the current working directory
+4. Legacy: `~/.config/hop/hop.json`, `/etc/hop/hop.json`
 
 ## Development
 
@@ -83,9 +119,9 @@ bun test
 {
   "count": 3,
   "projects": [
-    { "name": "api-prod", "path": "/home/deploy/projects/api", "type": "tool" },
-    { "name": "web-prod", "path": "/home/deploy/projects/web", "type": "website" },
-    { "name": "infra-scripts", "path": "/home/deploy/projects/infra", "type": "dev-env" }
+    { "name": "api-prod", "path": "/home/deploy/projects/api", "type": "tool", "system": null },
+    { "name": "web-prod", "path": "/home/deploy/projects/web", "type": "website", "system": null },
+    { "name": "infra-scripts", "path": "/home/deploy/projects/infra", "type": "dev-env", "system": null }
   ]
 }
 ```
@@ -114,6 +150,23 @@ bun test
   "accounts": [
     { "username": "deploy-bot", "role": "primary", "default": true },
     { "username": "admin-user", "role": "admin", "auth_method": "https-pat" }
+  ]
+}
+```
+
+### hop_list_systems
+
+```json
+{
+  "count": 2,
+  "systems": [
+    {
+      "system": "payments",
+      "project_count": 2,
+      "infra_repo_count": 1,
+      "projects": [{ "name": "api-core", "path": "/dev/api-core", "type": "tool" }],
+      "infra_repos": [{ "name": "payment-sdk", "description": "Third-party SDK", "upstream": null }]
+    }
   ]
 }
 ```

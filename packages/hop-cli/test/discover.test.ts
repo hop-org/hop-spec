@@ -18,13 +18,15 @@ import { tmpdir } from "node:os";
 const CLI = join(import.meta.dir, "..", "src", "cli.ts");
 const FIXTURE = join(import.meta.dir, "..", "..", "..", "spec", "examples", "hop-example-vps-server.json");
 const MINIMAL = join(import.meta.dir, "..", "..", "..", "spec", "examples", "hop-example-minimal.json");
+// Temp HOME so ~/.hop/settings.json doesn't override HOP_CONFIG_PATH
+const ISOLATED_HOME = join(tmpdir(), `hop-discover-test-${process.pid}`);
 
 async function run(
   args: string[],
   env?: Record<string, string>,
 ): Promise<{ stdout: string; stderr: string; exitCode: number }> {
   const proc = Bun.spawn(["bun", CLI, ...args], {
-    env: { ...process.env, ...env },
+    env: { ...process.env, HOME: ISOLATED_HOME, ...env },
     stdout: "pipe",
     stderr: "pipe",
   });
