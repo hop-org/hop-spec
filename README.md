@@ -1,6 +1,6 @@
 # HarnessOps
 
-> One JSON file. Every AI tool knows your machine.
+> **Your skills, hooks, and agents work on every machine — because `hop.json` tells them where everything is.**
 
 [![Schema Version](https://img.shields.io/badge/schema-v0.1.0-blue)](spec/hop-schema.json)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
@@ -11,15 +11,44 @@
 [![npm: cli](https://img.shields.io/npm/v/@hop-org/hop-spec-cli?label=cli)](https://www.npmjs.com/package/@hop-org/hop-spec-cli)
 [![npm: mcp](https://img.shields.io/npm/v/@hop-org/hop-spec-mcp?label=mcp)](https://www.npmjs.com/package/@hop-org/hop-spec-mcp)
 
+```
+Laptop:  hop path my-api  →  /Users/me/dev/my-api
+VPS:     hop path my-api  →  /home/ubuntu/projects/my-api
+Client:  hop path my-api  →  /opt/workspaces/my-api
+```
+
+One JSON file per machine. Skills resolve paths at runtime instead of hardcoding them. Hooks discover project configs dynamically. Agents know where everything is from their first turn — no scanning, no guessing, no wasting tokens describing your machine in markdown.
+
 ---
 
 ## The Problem
 
-You use Claude Code on your laptop. You spin up a VPS. You switch to a Cloud IDE. Each time: MCP servers need reconfiguring, paths break, plugins fail. You waste time recreating what every tool already needs to know.
+You build a skill that scans git status across repos, or a hook that routes commits to the right GitHub account, or a subagent that needs to find your project's data directory. It works on your machine. Then you move to a VPS — different paths, different home directory, different account setup. Everything breaks.
+
+Today, most people solve this by hardcoding paths into scripts or cramming machine facts into `AGENTS.md` / `CLAUDE.md` — burning instruction tokens on things that never change between sessions and aren't structured enough for tools to parse programmatically.
 
 ## The Solution
 
-One `hop.json` per machine. It describes what the machine is, what projects live on it, and how accounts are configured. Tools read it. Agents understand it.
+**`hop.json`** — one file per machine that describes what the machine is, what projects live on it, and how accounts and tools are configured. Skills, hooks, and agents read it dynamically. You write them once, they run anywhere.
+
+| What you're building | Without HOP | With HOP |
+|----------------------|-------------|----------|
+| **A skill** that scans all repos | Hardcode paths or ask the user every time | `hop projects --json` returns every path |
+| **A hook** that picks the right git account | Parse prose from AGENTS.md and hope | `hop_get_account github` returns structured data |
+| **A subagent** that needs project config | Rely on parent passing the right context | `hop_get_project my-api` gets path, extensions, git config |
+| **A script** that runs across machines | `if [[ $(hostname) == ... ]]` branching | `hop path my-api` resolves the local path |
+
+### Agents start every session blind
+
+An agent doesn't remember your machine between sessions. It doesn't know your dev root, your project layout, your accounts. One MCP call to `hop_machine` and it has instant machine awareness. `hop_list_projects` maps the entire environment. Your `AGENTS.md` stays focused on *how to work* instead of *where things are*.
+
+### The complexity is real and growing
+
+If you're running agents seriously, your machine probably has multiple GitHub accounts, dozens of projects across different directories, tool-specific configs per project, and infrastructure reference clones. That's not going away. HOP gives you one structured, queryable place to capture all of it — and a protocol (CLI + MCP + library) for any tool to consume it.
+
+---
+
+## How It Works
 
 ```json
 {
@@ -32,15 +61,15 @@ One `hop.json` per machine. It describes what the machine is, what projects live
   },
   "projects": [
     {
-      "name": "my-app",
-      "path": "/Users/me/dev/my-app",
-      "git": { "remote_url": "git@github.com:me/my-app.git" }
+      "name": "my-api",
+      "path": "/Users/me/dev/my-api",
+      "git": { "remote_url": "git@github.com:me/my-api.git" }
     }
   ]
 }
 ```
 
-Only `schema_version` and `machine` (with `id` and `name`) are required. Everything else is opt-in.
+Only `schema_version` and `machine.id` are required. Everything else is opt-in. Start minimal, add sections as your setup grows.
 
 ---
 
@@ -100,6 +129,79 @@ Tools discover `hop.json` automatically:
 3. `~/.hop/settings.json` pointer — redirects to a hop.json stored elsewhere
 4. Walk up from current directory
 5. Legacy: `~/.config/hop/hop.json`, `/etc/hop/hop.json`
+
+---
+
+## Dynamic Referencing in Practice
+
+The core pattern: **never hardcode a path, account, or config. Resolve it from HOP at runtime.**
+
+### In skills
+
+A `/session-start` skill needs to scan git status across all your repos and present bundle options. It doesn't know (or care) where the repos are:
+
+```bash
+# skill script — works on any machine with hop.json
+for proj in $(hop projects --json | jq -r '.[].name'); do
+  PROJECT_PATH=$(hop path "$proj")
+  cd "$PROJECT_PATH" && git status --short
+done
+```
+
+### In hooks
+
+A pre-commit hook routes to the correct GitHub account based on which project you're in:
+
+```bash
+# hook script — resolves account dynamically
+ACCOUNT=$(hop project "$PROJECT_NAME" --json | jq -r '.account_override // empty')
+if [ -n "$ACCOUNT" ]; then
+  gh auth switch --user "$ACCOUNT"
+fi
+```
+
+### In subagents
+
+A spawned subagent needs to find a project's data directory, build output, or extension config. It calls one MCP tool:
+
+```
+Agent calls: hop_get_project("sls")
+Returns:     { path: "/home/ubuntu/infra-repo-clones/sls",
+               extensions: { runtime: { binary: "/home/ubuntu/.local/bin/sls",
+                                         data_dir: "/home/ubuntu/.sls" } } }
+```
+
+The subagent knows exactly where to look. No parent context needed. No scanning the filesystem.
+
+### In your AGENTS.md
+
+Instead of burning tokens on machine facts:
+
+```markdown
+<!-- Before: 30+ lines of paths, accounts, configs in AGENTS.md -->
+Dev root: /home/ubuntu/dev. SLS binary: /home/ubuntu/.local/bin/sls.
+GitHub: org-bot (primary, SSH), personal-gh (HTTPS, PAT)...
+```
+
+```markdown
+<!-- After: 1 line in AGENTS.md -->
+Machine config is in hop.json. Use hop MCP tools to discover projects, accounts, and paths.
+```
+
+### Across machines
+
+Same skill, same hook, same subagent — three different machines:
+
+```json
+// laptop hop.json                    // vps hop.json
+{ "machine": { "id": "laptop" },     { "machine": { "id": "prod-vps" },
+  "projects": [{                        "projects": [{
+    "name": "my-api",                    "name": "my-api",
+    "path": "/Users/me/dev/my-api"       "path": "/home/deploy/my-api"
+  }] }                                 }] }
+```
+
+`hop path my-api` returns the right answer on each machine. Your toolchain is machine-independent.
 
 ---
 
