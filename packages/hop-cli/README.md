@@ -1,11 +1,11 @@
-# @harnessops/cli
+# @hop-org/hop-spec-cli
 
 Command-line tool for querying and managing `hop.json` configurations.
 
 ## Install
 
 ```bash
-npm install -g @harnessops/cli
+npm install -g @hop-org/hop-spec-cli
 ```
 
 ## Commands
@@ -90,10 +90,11 @@ hop where
 
 The CLI finds `hop.json` using this resolution order:
 
-1. `$HOP_CONFIG_PATH` environment variable
-2. Walk up from current directory
-3. `~/.config/hop/hop.json`
-4. `/etc/hop/hop.json`
+1. `~/.hop/settings.json` pointer
+2. `$HOP_CONFIG_PATH` environment variable
+3. `~/.hop/hop.json` (default location)
+4. Walk up from current directory
+5. Legacy: `~/.config/hop/hop.json`, `/etc/hop/hop.json`
 
 ## Development
 

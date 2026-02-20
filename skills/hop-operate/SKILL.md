@@ -201,9 +201,9 @@ Add to your MCP client config (e.g., Claude Code `settings.json`):
 ```json
 {
   "mcpServers": {
-    "harnessops": {
+    "hop-mcp": {
       "command": "npx",
-      "args": ["-y", "@harnessops/mcp"]
+      "args": ["-y", "@hop-org/hop-spec-mcp"]
     }
   }
 }
@@ -213,7 +213,7 @@ Or if installed locally:
 ```json
 {
   "mcpServers": {
-    "harnessops": {
+    "hop-mcp": {
       "command": "node",
       "args": ["/path/to/hop-spec/packages/hop-mcp/dist/index.js"]
     }

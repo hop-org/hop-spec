@@ -1,7 +1,7 @@
 import { readdirSync, statSync, existsSync, readFileSync } from "node:fs";
 import { join, basename, resolve } from "node:path";
-import type { Project, HopConfig } from "@harnessops/core";
-import { discoverAndLoad } from "@harnessops/core";
+import type { Project, HopConfig } from "@hop-org/hop-spec-core";
+import { discoverAndLoad } from "@hop-org/hop-spec-core";
 
 interface DiscoveredProject {
   name: string;

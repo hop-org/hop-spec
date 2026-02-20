@@ -82,7 +82,7 @@ Monorepo with shared core. CLI and MCP server are thin wrappers around `hop-core
 
 ## Distribution Plan
 
-1. **npm** (v0.1): `npm install -g @harnessops/cli`
-2. **npx** (v0.1): `npx @harnessops/cli init`
+1. **npm** (v0.1): `npm install -g @hop-org/hop-spec-cli`
+2. **npx** (v0.1): `npx @hop-org/hop-spec-cli init`
 3. **brew** (v0.2+): Homebrew tap via npm bridge
 4. **Binary** (v0.2+): Node SEA or pkg for standalone distribution

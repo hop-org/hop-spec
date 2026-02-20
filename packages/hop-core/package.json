@@ -1,5 +1,5 @@
 {
-  "name": "@harnessops/core",
+  "name": "@hop-org/hop-spec-core",
   "version": "0.1.0",
   "description": "Core library for HarnessOps: hop.json parser, validator, and discovery",
   "type": "module",
@@ -10,10 +10,25 @@
     "dev": "tsc --watch"
   },
   "exports": {
-    ".": "./dist/index.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
   },
   "files": ["dist"],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hop-org/hop-spec.git",
+    "directory": "packages/hop-core"
+  },
+  "homepage": "https://github.com/hop-org/hop-spec/tree/main/packages/hop-core",
+  "bugs": "https://github.com/hop-org/hop-spec/issues",
+  "author": "HarnessOps Contributors",
+  "keywords": ["harnessops", "hop", "machine-config", "ai-agent", "mcp"],
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "devDependencies": {
     "@types/node": "^25.0.10",
     "typescript": "^5.9.3"

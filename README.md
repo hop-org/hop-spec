@@ -4,6 +4,12 @@
 
 [![Schema Version](https://img.shields.io/badge/schema-v0.1.0-blue)](spec/hop-schema.json)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![MCP Compatible](https://img.shields.io/badge/MCP-compatible-8A2BE2)](https://modelcontextprotocol.io/)
+[![npm: core](https://img.shields.io/npm/v/@hop-org/hop-spec-core?label=core)](https://www.npmjs.com/package/@hop-org/hop-spec-core)
+[![npm: cli](https://img.shields.io/npm/v/@hop-org/hop-spec-cli?label=cli)](https://www.npmjs.com/package/@hop-org/hop-spec-cli)
+[![npm: mcp](https://img.shields.io/npm/v/@hop-org/hop-spec-mcp?label=mcp)](https://www.npmjs.com/package/@hop-org/hop-spec-mcp)
 
 ---
 
@@ -38,11 +44,47 @@ Only `schema_version` and `machine` (with `id` and `name`) are required. Everyth
 
 ---
 
+## Installation
+
+### Option 1: npx (no install)
+
+```bash
+npx @hop-org/hop-spec-cli init       # Create ~/.hop/hop.json
+npx @hop-org/hop-spec-cli projects   # List projects
+```
+
+### Option 2: npm global install
+
+```bash
+npm install -g @hop-org/hop-spec-cli @hop-org/hop-spec-mcp
+hop init              # Create ~/.hop/hop.json
+hop projects          # List projects
+```
+
+### Option 3: Bundled local install
+
+```bash
+git clone https://github.com/hop-org/hop-spec.git
+cd hop-spec
+bun run install-user  # Builds bundles and installs to ~/.local/bin/
+```
+
+### Option 4: Source build
+
+```bash
+git clone https://github.com/hop-org/hop-spec.git
+cd hop-spec
+bun install && bun run build
+# Run directly:
+node packages/hop-cli/dist/cli.js projects
+node packages/hop-mcp/dist/index.js
+```
+
+---
+
 ## Quick Start
 
 ```bash
-bun install -g @harnessops/cli   # or: npm install -g @harnessops/cli
-
 hop init              # Create ~/.hop/hop.json interactively
 hop machine           # Show machine identity
 hop projects          # List projects
@@ -140,9 +182,39 @@ Systems are about **architecture** ("these repos form the payments system"). Bun
 
 | Package | Purpose |
 |---------|---------|
-| [`@harnessops/core`](packages/hop-core/) | Shared library — types, discovery, validation |
-| [`@harnessops/cli`](packages/hop-cli/) | CLI — `hop init`, `hop discover`, `hop projects`, `hop bundle`, etc. |
-| [`@harnessops/mcp`](packages/hop-mcp/) | MCP server — `hop_machine`, `hop_list_projects`, `hop_get_project`, `hop_get_account`, `hop_list_bundles`, `hop_get_bundle`, `hop_list_infra_repos`, `hop_list_systems`, `hop_get_system` |
+| [`@hop-org/hop-spec-core`](packages/hop-core/) | Shared library — types, discovery, validation |
+| [`@hop-org/hop-spec-cli`](packages/hop-cli/) | CLI — `hop init`, `hop discover`, `hop projects`, `hop bundle`, etc. |
+| [`@hop-org/hop-spec-mcp`](packages/hop-mcp/) | MCP server — 9 tools for AI agents (see below) |
+
+### MCP Tools
+
+| Tool | Description |
+|------|-------------|
+| `hop_machine` | Get machine identity and configuration |
+| `hop_list_projects` | List all projects (optional type filter) |
+| `hop_get_project` | Get full project details by name |
+| `hop_get_account` | Get account info by service and username |
+| `hop_list_bundles` | List all bundles (optional project filter) |
+| `hop_get_bundle` | Get bundle details with resolved project objects |
+| `hop_list_infra_repos` | List infrastructure repo clones |
+| `hop_list_systems` | List all systems with project and infra repo counts |
+| `hop_get_system` | Get all repos in a specific system |
+
+Set `HOP_MCP_TOOLS` to load only the tools you need (saves context window):
+
+```json
+{
+  "mcpServers": {
+    "hop-mcp": {
+      "command": "npx",
+      "args": ["-y", "@hop-org/hop-spec-mcp"],
+      "env": {
+        "HOP_MCP_TOOLS": "hop_machine,hop_list_projects,hop_get_project"
+      }
+    }
+  }
+}
+```
 
 ---
 

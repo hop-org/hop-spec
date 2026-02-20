@@ -1,5 +1,5 @@
 {
-  "name": "@harnessops/cli",
+  "name": "@hop-org/hop-spec-cli",
   "version": "0.1.0",
   "description": "HarnessOps CLI — query and manage hop.json configurations",
   "type": "module",
@@ -14,13 +14,25 @@
     "test": "bun test"
   },
   "dependencies": {
-    "@harnessops/core": "workspace:*",
+    "@hop-org/hop-spec-core": "workspace:*",
     "ajv": "^8.17.0",
     "ajv-formats": "^3.0.0",
     "commander": "^12.0.0"
   },
   "files": ["dist"],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hop-org/hop-spec.git",
+    "directory": "packages/hop-cli"
+  },
+  "homepage": "https://github.com/hop-org/hop-spec/tree/main/packages/hop-cli",
+  "bugs": "https://github.com/hop-org/hop-spec/issues",
+  "author": "HarnessOps Contributors",
+  "keywords": ["harnessops", "hop", "cli", "machine-config", "ai-agent"],
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "devDependencies": {
     "@types/node": "^25.0.10",
     "typescript": "^5.9.3"

@@ -13,7 +13,7 @@ import addFormats from "ajv-formats";
 // Handle both CJS and ESM default exports
 const Ajv = (Ajv2020 as any).default ?? Ajv2020;
 const applyFormats = (addFormats as any).default ?? addFormats;
-import { discoverHopPath } from "@harnessops/core";
+import { discoverHopPath } from "@hop-org/hop-spec-core";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
