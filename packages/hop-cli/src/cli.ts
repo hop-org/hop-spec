@@ -8,6 +8,7 @@ import type { HopConfig } from "@hop-org/hop-spec-core";
 import { runInit } from "./init.js";
 import { runValidate } from "./validate.js";
 import { runDiscover } from "./discover.js";
+import { runAudit } from "./audit.js";
 
 const program = new Command();
 
@@ -546,6 +547,17 @@ program
   .option("-d, --depth <n>", "Max directory depth to scan (default: 3)", parseInt)
   .action(async (dir, opts) => {
     await runDiscover({ dir, depth: opts.depth, json: opts.json });
+  });
+
+// --- hop audit ---
+program
+  .command("audit")
+  .description("Reconcile hop.json against filesystem — find orphans, stale entries, and strays")
+  .option("--json", "Output as JSON")
+  .option("--scan", "Also scan outside managed dirs for unregistered git repos")
+  .action(async (opts) => {
+    const { config } = loadOrExit();
+    await runAudit(config, { json: opts.json, scan: opts.scan });
   });
 
 // --- hop init ---
