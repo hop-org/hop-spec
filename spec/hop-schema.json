@@ -86,7 +86,7 @@
         "id": {
           "type": "string",
           "description": "Unique machine identifier (slug format)",
-          "pattern": "^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$",
+          "pattern": "^[a-z0-9][a-z0-9_-]*[a-z0-9]$|^[a-z0-9]$",
           "examples": [
             "prod-vps",
             "my-cloud-ide",
@@ -295,7 +295,7 @@
         "name": {
           "type": "string",
           "description": "Unique project identifier (slug format)",
-          "pattern": "^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$"
+          "pattern": "^[a-z0-9][a-z0-9_-]*[a-z0-9]$|^[a-z0-9]$"
         },
         "path": {
           "type": "string",
@@ -342,7 +342,7 @@
         "system": {
           "type": "string",
           "description": "Logical system this project belongs to. Multiple projects (repos) that cooperate to deliver one capability share the same system identifier. Inspired by Backstage's System Model. Query with jq: .projects[] | select(.system == \"billing\")",
-          "pattern": "^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$",
+          "pattern": "^[a-z0-9][a-z0-9_-]*[a-z0-9]$|^[a-z0-9]$",
           "examples": [
             "billing",
             "agent-flywheel",
@@ -440,7 +440,7 @@
         "id": {
           "type": "string",
           "description": "Unique bundle identifier",
-          "pattern": "^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$"
+          "pattern": "^[a-z0-9][a-z0-9_-]*[a-z0-9]$|^[a-z0-9]$"
         },
         "name": {
           "type": "string",
@@ -533,7 +533,7 @@
                   "system": {
                     "type": "string",
                     "description": "Logical system this infra repo belongs to. Same concept as project.system \u2014 groups related repos across both owned projects and reference clones.",
-                    "pattern": "^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$",
+                    "pattern": "^[a-z0-9][a-z0-9_-]*[a-z0-9]$|^[a-z0-9]$",
                     "examples": [
                       "agent-flywheel",
                       "agent-clis"
@@ -547,6 +547,10 @@
                     "type": "string",
                     "description": "Upstream repository URL",
                     "format": "uri"
+                  },
+                  "path": {
+                    "type": "string",
+                    "description": "Absolute path override when repo lives outside infra_repos.path"
                   }
                 },
                 "additionalProperties": true

@@ -48,10 +48,14 @@ function getRegisteredPaths(config: HopConfig): Set<string> {
     if (p.path) paths.add(resolve(p.path));
   }
 
-  // Infra repos resolved against infra_repos.path
+  // Infra repos resolved against infra_repos.path (or per-repo path override)
   const infraBase = config.infra_repos?.path;
-  if (infraBase) {
-    for (const entry of config.infra_repos?.repos ?? []) {
+  for (const entry of config.infra_repos?.repos ?? []) {
+    if (typeof entry !== "string" && entry.path) {
+      // Explicit path override — repo lives outside infra_repos.path
+      paths.add(resolve(entry.path));
+    } else if (infraBase) {
+      // Default: resolve against base path
       const name = infraRepoName(entry);
       paths.add(resolve(join(infraBase, name)));
     }

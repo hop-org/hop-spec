@@ -10,6 +10,7 @@ export {
 export {
   normalizeInfraRepo,
   infraRepoName,
+  resolveInfraRepoPath,
   collectSystems,
 } from "./helpers.js";
 export type {
