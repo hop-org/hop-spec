@@ -3,7 +3,7 @@
 import { Command } from "commander";
 import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { discoverAndLoad, discoverHopPath, setConfigPath, collectSystems, normalizeInfraRepo, infraRepoName } from "@hop-org/hop-spec-core";
+import { discoverAndLoad, discoverHopPath, setConfigPath, collectSystems, normalizeInfraRepo, infraRepoName, resolveInfraRepoPath } from "@hop-org/hop-spec-core";
 import type { HopConfig } from "@hop-org/hop-spec-core";
 import { runInit } from "./init.js";
 import { runValidate } from "./validate.js";
@@ -109,24 +109,31 @@ program
     const projects = config.projects ?? [];
     const project = projects.find((p) => p.name === name);
 
-    if (!project) {
-      console.error(`Error: Project '${name}' not found.`);
-      const names = projects.map((p) => p.name);
-      if (names.length > 0) {
-        console.error(`Available projects: ${names.join(", ")}`);
+    if (project) {
+      if (!project.path) {
+        console.error(`Error: Project '${name}' has no path defined.`);
+        process.exit(1);
+        return;
       }
-      process.exit(1);
+      console.log(project.path);
       return;
     }
 
-    if (!project.path) {
-      console.error(`Error: Project '${name}' has no path defined.`);
-      process.exit(1);
+    // Fall back to infra repos
+    const infraPath = resolveInfraRepoPath(config, name);
+    if (infraPath) {
+      console.log(infraPath);
       return;
     }
 
-    // Output just the path (for use in scripts: cd $(hop path my-project))
-    console.log(project.path);
+    console.error(`Error: Project '${name}' not found.`);
+    const projectNames = projects.map((p) => p.name);
+    const infraNames = (config.infra_repos?.repos ?? []).map((r) => infraRepoName(r));
+    const allNames = [...projectNames, ...infraNames].filter(Boolean);
+    if (allNames.length > 0) {
+      console.error(`Available: ${allNames.join(", ")}`);
+    }
+    process.exit(1);
   });
 
 // --- hop machine ---

@@ -22,6 +22,28 @@ export function infraRepoName(entry: string | InfraRepoEntry): string {
 }
 
 /**
+ * Resolve the filesystem path for an infra repo by name.
+ * Checks explicit path override first, then falls back to base path + name.
+ * Returns undefined if not found or path cannot be resolved.
+ */
+export function resolveInfraRepoPath(config: HopConfig, name: string): string | undefined {
+  const infra = config.infra_repos;
+  if (!infra?.repos) return undefined;
+
+  for (const entry of infra.repos) {
+    const normalized = normalizeInfraRepo(entry);
+    if (normalized.name !== name) continue;
+    // Explicit path override on the entry
+    if (normalized.path) return normalized.path;
+    // Fall back to base path + name
+    if (infra.path) return `${infra.path}/${name}`;
+    return undefined;
+  }
+
+  return undefined;
+}
+
+/**
  * Collect all unique system identifiers from projects and infra repos.
  */
 export function collectSystems(config: HopConfig): Map<string, { projects: Project[]; infraRepos: InfraRepoEntry[] }> {

@@ -101,6 +101,7 @@ export interface InfraRepoEntry {
   system?: string;
   description?: string;
   upstream?: string;
+  path?: string;
   [key: string]: unknown;
 }
 
