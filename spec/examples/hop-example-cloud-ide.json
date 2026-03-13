@@ -91,6 +91,24 @@
   ],
 
   "extensions": {
+    "claude-code": {
+      "enabled": true,
+      "config_dir": "/workspace/.claude",
+      "plugins_cache": "/workspace/.claude/plugins/cache/my-marketplace",
+      "installed_manifest": "/workspace/.claude/plugins/installed_plugins.json",
+      "marketplace_source": "main-project"
+    },
+    "codex-cli": {
+      "enabled": true,
+      "config_dir": "/root/.codex",
+      "agents_dir": "/workspace/main-project/codex/.agents",
+      "skills_dir": "/workspace/main-project/codex/.agents/skills"
+    },
+    "gemini-cli": {
+      "enabled": false,
+      "config_dir": "/root/.gemini",
+      "note": "No structured skill system yet — uses GEMINI.md inline instructions"
+    },
     "fireflies": {
       "enabled": true,
       "api_url": "https://api.fireflies.ai/graphql",
