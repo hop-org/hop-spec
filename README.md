@@ -224,7 +224,7 @@ Extensions follow the `devcontainer.json` customizations pattern — the core sp
 
 **When to add an extension:** Only when an agent can't self-discover the info and would waste time or make mistakes without it. If `which tool` or `--version` gives the agent what it needs, don't add an extension.
 
-Good extensions: beads prefix per project (agent can't guess `api` vs `web`), basic-memory project name routing, agent-mail project keys.
+Good extensions: beads prefix per project (agent can't guess `api` vs `web`), basic-memory project name routing, agent CLI skills/plugins configuration.
 
 Not extensions: npm version, Docker install path, PostgreSQL host — agents discover these trivially.
 
@@ -239,6 +239,39 @@ Extensions live at two scopes:
 ```json
 { "extensions": { "beads": { "prefix": "api", "sync_branch": "beads-sync" } } }
 ```
+
+#### Agent Skills
+
+Agent CLI skills/plugins are a natural fit for machine-scoped extensions. Each agent CLI has its own skill system — different directory structures, different manifest formats, different activation mechanisms. HOP maps them per machine so hooks, scripts, and other agents can discover installed skills dynamically instead of hardcoding paths.
+
+```json
+{
+  "extensions": {
+    "claude-code": {
+      "enabled": true,
+      "config_dir": "/workspace/.claude",
+      "plugins_cache": "/workspace/.claude/plugins/cache/forgevista",
+      "installed_manifest": "/workspace/.claude/plugins/installed_plugins.json",
+      "marketplace_source": "my-marketplace"
+    },
+    "codex-cli": {
+      "enabled": true,
+      "config_dir": "/root/.codex",
+      "agents_dir": "/workspace/my-marketplace/codex/.agents",
+      "skills_dir": "/workspace/my-marketplace/codex/.agents/skills"
+    },
+    "gemini-cli": {
+      "enabled": false,
+      "config_dir": "/root/.gemini",
+      "note": "No structured skill system yet"
+    }
+  }
+}
+```
+
+**Why this matters:** A discovery hook running from a plugin cache can't walk the filesystem to find its own manifest — the cache directory is detached from the source repo. The hook reads `extensions.claude-code.installed_manifest` from HOP to locate the manifest reliably on any machine. Same pattern for Codex agents discovering their skills directory or any future CLI skill system.
+
+**Convention:** Use the agent CLI's common name as the extension key (`claude-code`, `codex-cli`, `gemini-cli`). Include at minimum `enabled` and `config_dir`. Add skill-system-specific fields as needed — the core spec doesn't validate extension contents.
 
 ### Systems
 
