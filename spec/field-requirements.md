@@ -150,7 +150,8 @@ project         # Generic default
 | Field | Required | Default | Rationale |
 |-------|----------|---------|-----------|
 | `remote_url` | Optional | `null` | Can be discovered from `.git/config` |
-| `default_branch` | Optional | `"main"` | Modern git default |
+| `default_branch` | Optional | `"main"` | Modern git default (GitHub default branch) |
+| `pr_branch` | Optional | *falls back to `default_branch`* | Target branch for PRs when it differs from default (e.g., `dev` in a dev/test/main pipeline). Discovery scripts diff against this branch. |
 
 ---
 
