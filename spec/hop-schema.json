@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://harnessops.org/schema/v0.1.0/hop.json",
-  "title": "HarnessOps Registry",
-  "description": "HarnessOps \u2014 declarative specification for AI development machine environments, unifying tool configuration, project registration, MCP server setup, and multi-machine synchronization.",
+  "$id": "https://hop.dev/schema/v0.1.0/hop.json",
+  "title": "HOP Registry",
+  "description": "HOP (Harness Operator Protocol) \u2014 declarative specification for AI development machine environments, unifying tool configuration, project registration, MCP server setup, and multi-machine synchronization.",
   "type": "object",
   "required": [
     "schema_version",
@@ -16,7 +16,7 @@
     },
     "schema_version": {
       "type": "string",
-      "description": "HarnessOps schema version (semver)",
+      "description": "HOP schema version (semver)",
       "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$",
       "examples": [
         "0.1.0",
@@ -25,7 +25,7 @@
     },
     "description": {
       "type": "string",
-      "description": "Human-readable description of this HarnessOps registry instance"
+      "description": "Human-readable description of this HOP registry instance"
     },
     "machine": {
       "$ref": "#/$defs/machine"
@@ -66,7 +66,7 @@
     },
     "extensions": {
       "$ref": "#/$defs/extensions",
-      "description": "Machine-scoped extensions for config agents can't self-discover. Tool authors define their own configuration under a unique key (e.g., \"beads\", \"basic-memory\", \"agent-mail\"). Only include config that an agent would waste time or make mistakes without. HarnessOps core does not validate extension contents \u2014 each tool owns its own sub-schema."
+      "description": "Machine-scoped extensions for config agents can't self-discover. Tool authors define their own configuration under a unique key (e.g., \"beads\", \"basic-memory\", \"agent-mail\"). Only include config that an agent would waste time or make mistakes without. HOP core does not validate extension contents \u2014 each tool owns its own sub-schema."
     },
     "services": {
       "$ref": "#/$defs/services",
@@ -355,7 +355,7 @@
         },
         "extensions": {
           "$ref": "#/$defs/extensions",
-          "description": "Project-scoped extensions for config agents can't self-discover (e.g., beads prefix, basic-memory project name, agent-mail project key). Only include what makes agents meaningfully more effective. HarnessOps core does not validate extension contents \u2014 each tool owns its own sub-schema."
+          "description": "Project-scoped extensions for config agents can't self-discover (e.g., beads prefix, basic-memory project name, agent-mail project key). Only include what makes agents meaningfully more effective. HOP core does not validate extension contents \u2014 each tool owns its own sub-schema."
         }
       },
       "additionalProperties": true
@@ -374,8 +374,17 @@
         },
         "default_branch": {
           "type": "string",
-          "description": "Default branch name",
+          "description": "Default branch name (GitHub default branch)",
           "default": "main"
+        },
+        "pr_branch": {
+          "type": "string",
+          "description": "Target branch for pull requests. Use when PRs should target a branch other than default_branch (e.g., dev in a dev/test/main pipeline). Discovery scripts diff against this branch. Falls back to default_branch if not set.",
+          "examples": [
+            "dev",
+            "develop",
+            "staging"
+          ]
         }
       },
       "additionalProperties": true
