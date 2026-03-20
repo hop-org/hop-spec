@@ -1,7 +1,7 @@
 {
   "name": "@hop-org/hop-spec-cli",
   "version": "0.1.0",
-  "description": "HarnessOps CLI — query and manage hop.json configurations",
+  "description": "HOP CLI — query and manage hop.json configurations",
   "type": "module",
   "bin": {
     "hop": "dist/cli.js"

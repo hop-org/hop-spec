@@ -374,8 +374,17 @@
         },
         "default_branch": {
           "type": "string",
-          "description": "Default branch name",
+          "description": "Default branch name (GitHub default branch)",
           "default": "main"
+        },
+        "pr_branch": {
+          "type": "string",
+          "description": "Target branch for pull requests. Use when PRs should target a branch other than default_branch (e.g., dev in a dev/test/main pipeline). Discovery and execution scripts diff against this branch. Falls back to default_branch if not set.",
+          "examples": [
+            "dev",
+            "develop",
+            "staging"
+          ]
         }
       },
       "additionalProperties": true
