@@ -9,6 +9,7 @@ import { runInit } from "./init.js";
 import { runValidate } from "./validate.js";
 import { runDiscover } from "./discover.js";
 import { runAudit } from "./audit.js";
+import { runReport } from "./report.js";
 
 const program = new Command();
 
@@ -565,6 +566,17 @@ program
   .action(async (opts) => {
     const { config } = loadOrExit();
     await runAudit(config, { json: opts.json, scan: opts.scan });
+  });
+
+// --- hop report ---
+program
+  .command("report")
+  .description("Render hop.json as a self-contained HTML walkthrough")
+  .option("-o, --out <path>", "Output file path (default: ~/.hop/report.html)")
+  .option("--scan", "Also scan outside managed dirs for unregistered git repos")
+  .action(async (opts) => {
+    const { config, path: hopPath } = loadOrExit();
+    await runReport(config, hopPath, { out: opts.out, scan: opts.scan });
   });
 
 // --- hop init ---
