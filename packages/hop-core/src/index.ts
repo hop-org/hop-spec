@@ -29,4 +29,6 @@ export type {
   ExtensionEntry,
   Services,
   Service,
+  Harness,
+  Runtime,
 } from "./types.js";

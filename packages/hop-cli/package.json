@@ -1,17 +1,18 @@
 {
   "name": "@hop-org/hop-spec-cli",
   "version": "0.1.0",
-  "description": "HOP CLI — query and manage hop.json configurations",
+  "description": "HOP CLI \u00e2\u20ac\u201d query and manage hop.json configurations",
   "type": "module",
   "bin": {
     "hop": "dist/cli.js"
   },
   "main": "dist/cli.js",
   "scripts": {
-    "build": "tsc",
-    "bundle": "bun build --bundle --target=node --outfile=dist/hop-cli.bundle.js src/cli.ts",
+    "build": "node ../../scripts/gen-assets.mjs && tsc",
+    "bundle": "node ../../scripts/gen-assets.mjs && bun build --bundle --target=node --outfile=dist/hop-cli.bundle.js src/cli.ts",
     "dev": "tsc --watch",
-    "test": "bun test"
+    "test": "bun test",
+    "gen-assets": "node ../../scripts/gen-assets.mjs"
   },
   "dependencies": {
     "@hop-org/hop-spec-core": "workspace:*",
@@ -19,7 +20,9 @@
     "ajv-formats": "^3.0.0",
     "commander": "^12.0.0"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -29,7 +32,13 @@
   "homepage": "https://github.com/hop-org/hop-spec/tree/main/packages/hop-cli",
   "bugs": "https://github.com/hop-org/hop-spec/issues",
   "author": "HarnessOps Contributors",
-  "keywords": ["harnessops", "hop", "cli", "machine-config", "ai-agent"],
+  "keywords": [
+    "harnessops",
+    "hop",
+    "cli",
+    "machine-config",
+    "ai-agent"
+  ],
   "engines": {
     "node": ">=18.0.0"
   },

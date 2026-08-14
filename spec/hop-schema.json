@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://harnessops.org/schema/v0.1.0/hop.json",
   "title": "HarnessOps Registry",
-  "description": "HarnessOps \u2014 declarative specification for AI development machine environments, unifying tool configuration, project registration, MCP server setup, and multi-machine synchronization.",
+  "description": "HarnessOps — declarative specification for AI development machine environments, unifying tool configuration, project registration, MCP server setup, and multi-machine synchronization.",
   "type": "object",
   "required": [
     "schema_version",
@@ -66,11 +66,25 @@
     },
     "extensions": {
       "$ref": "#/$defs/extensions",
-      "description": "Machine-scoped extensions for config agents can't self-discover. Tool authors define their own configuration under a unique key (e.g., \"beads\", \"basic-memory\", \"agent-mail\"). Only include config that an agent would waste time or make mistakes without. HarnessOps core does not validate extension contents \u2014 each tool owns its own sub-schema."
+      "description": "Machine-scoped extensions for config agents can't self-discover. Tool authors define their own configuration under a unique key (e.g., \"beads\", \"basic-memory\", \"agent-mail\"). Only include config that an agent would waste time or make mistakes without. HarnessOps core does not validate extension contents — each tool owns its own sub-schema."
     },
     "services": {
       "$ref": "#/$defs/services",
       "description": "Running infrastructure services that agents need to discover at runtime (e.g., agent-mail, MCP servers, databases)"
+    },
+    "harnesses": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/harness"
+      },
+      "description": "Agent harnesses installed on this machine. HarnessOps records where each keeps its configuration so tools can play back what is actually active (MCP servers, skills, plugins). It does not govern those surfaces."
+    },
+    "runtimes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/runtime"
+      },
+      "description": "Programs installed on this machine, so an agent can resolve one lookup instead of searching the filesystem. Referenced by name from services and harnesses so a shared runtime is defined once."
     }
   },
   "additionalProperties": true,
@@ -355,7 +369,7 @@
         },
         "extensions": {
           "$ref": "#/$defs/extensions",
-          "description": "Project-scoped extensions for config agents can't self-discover (e.g., beads prefix, basic-memory project name, agent-mail project key). Only include what makes agents meaningfully more effective. HarnessOps core does not validate extension contents \u2014 each tool owns its own sub-schema."
+          "description": "Project-scoped extensions for config agents can't self-discover (e.g., beads prefix, basic-memory project name, agent-mail project key). Only include what makes agents meaningfully more effective. HarnessOps core does not validate extension contents — each tool owns its own sub-schema."
         }
       },
       "additionalProperties": true
@@ -391,7 +405,7 @@
     },
     "extensions": {
       "type": "object",
-      "description": "Generic extension namespace. Keys are tool identifiers (e.g., \"beads\", \"basic-memory\", \"agent-mail\", \"claude-code\"). Values are tool-defined configuration objects. Only for config agents can't self-discover. Follows the devcontainer.json customizations pattern: core spec does not define extension contents \u2014 tool authors own their sub-schemas.",
+      "description": "Generic extension namespace. Keys are tool identifiers (e.g., \"beads\", \"basic-memory\", \"agent-mail\", \"claude-code\"). Values are tool-defined configuration objects. Only for config agents can't self-discover. Follows the devcontainer.json customizations pattern: core spec does not define extension contents — tool authors own their sub-schemas.",
       "additionalProperties": {
         "$ref": "#/$defs/extensionEntry"
       },
@@ -476,7 +490,7 @@
     },
     "infraRepos": {
       "type": "object",
-      "description": "Infrastructure repository clones \u2014 read-only reference copies of external repos cloned for tool source inspection, API reference, or building from source. These are not the user's own projects; they are reference clones of upstream repositories.",
+      "description": "Infrastructure repository clones — read-only reference copies of external repos cloned for tool source inspection, API reference, or building from source. These are not the user's own projects; they are reference clones of upstream repositories.",
       "properties": {
         "path": {
           "type": "string",
@@ -541,7 +555,7 @@
                   },
                   "system": {
                     "type": "string",
-                    "description": "Logical system this infra repo belongs to. Same concept as project.system \u2014 groups related repos across both owned projects and reference clones.",
+                    "description": "Logical system this infra repo belongs to. Same concept as project.system — groups related repos across both owned projects and reference clones.",
                     "pattern": "^[a-z0-9][a-z0-9_-]*[a-z0-9]$|^[a-z0-9]$",
                     "examples": [
                       "agent-flywheel",
@@ -606,6 +620,10 @@
         "description": {
           "type": "string",
           "description": "Human-readable description of the service"
+        },
+        "runtime": {
+          "type": "string",
+          "description": "Name of the runtime in `runtimes` that this service runs on. A reference rather than a copy, so a runtime shared by several services is described in exactly one place."
         }
       },
       "additionalProperties": true,
@@ -617,6 +635,99 @@
         "$ref": "#/$defs/service"
       },
       "description": "Running infrastructure services that agents need to discover. Keys are service identifiers (e.g., agent_mail, cass_cm). Unlike extensions (tool config), services represent live endpoints agents connect to at runtime."
+    },
+    "harness": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Identifier for this harness installation, unique within the file"
+        },
+        "type": {
+          "type": "string",
+          "description": "Harness family. Readers use this to know how to parse the referenced files; an unrecognised value is not an error, the paths are simply reported without being parsed.",
+          "examples": [
+            "claude-code",
+            "codex",
+            "gemini-cli",
+            "cursor"
+          ]
+        },
+        "config": {
+          "type": "string",
+          "description": "Primary config file. For claude-code this is ~/.claude.json, which holds machine-scoped MCP servers."
+        },
+        "settings": {
+          "type": "string",
+          "description": "User settings file, if the harness keeps one separately"
+        },
+        "plugins": {
+          "type": "string",
+          "description": "Directory holding installed plugins and known marketplaces"
+        },
+        "skills": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Directories searched for skills. An array because harnesses commonly read from several, and some are shared between harnesses."
+        },
+        "account_scoped": {
+          "type": "boolean",
+          "description": "True when this harness can also load MCP servers provisioned against the user's account rather than from local files. Those are not discoverable on disk, so reporting tools must disclose them as a blind spot rather than implying the local list is complete."
+        },
+        "note": {
+          "type": "string",
+          "description": "Free text"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": true,
+      "description": "One agent harness installed on this machine, described by where its configuration lives. Location only — never content."
+    },
+    "runtime": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "How this runtime is referred to elsewhere in the file. Services and harnesses reference it by this name rather than repeating its location."
+        },
+        "entrypoint": {
+          "type": "string",
+          "description": "The path to invoke. Whatever actually works on this machine — a shim script, a package-manager symlink, or a path inside a package directory. No particular mechanism is assumed or required."
+        },
+        "payload": {
+          "type": "string",
+          "description": "Directory holding the installed program itself, when it differs from the entrypoint. Usually owned by a package manager and not safe to relocate by hand."
+        },
+        "config": {
+          "type": "string",
+          "description": "Directory holding this runtime's configuration and state, when it keeps one."
+        },
+        "manager": {
+          "type": "string",
+          "description": "What installs and updates this runtime. Tells an agent whether a path may be relocated safely: anything package-managed should be left where it is, because moving it breaks upgrades.",
+          "examples": [
+            "winget",
+            "npm",
+            "bun",
+            "manual",
+            "self-built",
+            "os"
+          ]
+        },
+        "upgrade": {
+          "type": "string",
+          "description": "Command that updates this runtime in place, including any package identifier it needs."
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": true,
+      "description": "An installed program this machine can run. Records location and ownership only — never behaviour or configuration content."
     }
   }
 }

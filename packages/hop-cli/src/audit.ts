@@ -157,7 +157,14 @@ export interface AuditOptions {
   scan?: boolean;
 }
 
-export async function runAudit(config: HopConfig, opts: AuditOptions): Promise<void> {
+/**
+ * Compute the audit result without printing anything.
+ *
+ * Split out from runAudit so other commands (notably `hop report`) can render
+ * the same reconciliation data in their own format instead of re-implementing
+ * the orphan/stale/stray rules and drifting from them.
+ */
+export function computeAudit(config: HopConfig, opts: { scan?: boolean } = {}): AuditResult {
   const registeredPaths = getRegisteredPaths(config);
   const managedDirs = getManagedDirs(config);
   const result: AuditResult = {
@@ -198,6 +205,13 @@ export async function runAudit(config: HopConfig, opts: AuditOptions): Promise<v
   if (opts.scan) {
     result.strays = scanForStrays(config, registeredPaths, managedDirs);
   }
+
+  return result;
+}
+
+export async function runAudit(config: HopConfig, opts: AuditOptions): Promise<void> {
+  const result = computeAudit(config, { scan: opts.scan });
+  const managedDirs = result.managed_dirs;
 
   // --- Output ---
   if (opts.json) {

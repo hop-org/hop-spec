@@ -33,6 +33,15 @@ mkdir -p "$HOP_BIN" "$LOCAL_BIN"
 cp "$CLI_BUNDLE" "$HOP_BIN/hop-cli.js"
 cp "$MCP_BUNDLE" "$HOP_BIN/hop-mcp.js"
 
+# Ship the schema alongside the runtime.
+# `hop validate` locates the schema by walking up from the running script
+# looking for spec/hop-schema.json. That works from a source checkout but never
+# from an install: walking up from ~/.hop/bin reaches the home directory and
+# stops. Placing the schema at ~/.hop/spec/ satisfies the first iteration of
+# that walk, so validate works without --schema.
+mkdir -p "$HOP_HOME/spec"
+cp "$REPO_DIR/spec/hop-schema.json" "$HOP_HOME/spec/hop-schema.json"
+
 # Create ~/.local/bin/hop wrapper
 cat > "$LOCAL_BIN/hop" << 'WRAPPER'
 #!/usr/bin/env bash
